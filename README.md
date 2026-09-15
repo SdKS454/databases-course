@@ -10,13 +10,29 @@
 
 ```
 HW1/
-├── README.md          — описание задания: SQL-схема, ER-диаграмма, запросы реляционной алгебры
-└── ER_diagram.png     — ER-диаграмма базы данных в нотации Crow's Foot
+├── README.md                  — HW1: SQL-схема, ER-диаграмма, запросы реляционной алгебры
+└── ER_diagram.png             — ER-диаграмма в нотации Crow's Foot
+
+HW2/
+├── README.md                  — HW2: отчёт по работе с таблицами в PostgreSQL
+├── create_tables.sql          — создание 7 таблиц
+├── alter_tables.sql           — 5 ALTER-запросов
+├── insert_data.sql            — заполнение таблиц тестовыми данными
+├── update_data.sql            — 5 UPDATE-запросов
+└── output/                    — вывод структуры и данных из СУБД
 ```
 
-## Содержимое домашней работы
+## Содержимое домашних работ
 
-- **6+ сущностей**: Players, Teams, Matches, Heroes, Items, PlayerMatchStats, PlayerMatchItems
+### HW1 — Проектирование базы данных
+- **Сущности**: Players, Teams, Matches, Heroes, Items, PlayerMatchStats, PlayerMatchItems
 - **ER-диаграмма** в нотации Crow's Foot (см. `HW1/ER_diagram.png`)
 - **SQL-схема** для PostgreSQL (см. `HW1/README.md`)
 - **2 запроса на реляционной алгебре**: с операциями σ и π; с операцией соединения ⋈
+
+### HW2 — Работа с таблицами в PostgreSQL
+- **CREATE TABLE** — 7 таблиц по ER-диаграмме
+- **ALTER TABLE** — 5 запросов изменения структуры
+- **INSERT** — 4–5 тестовых записей в каждую таблицу
+- **UPDATE** — 5 запросов изменения данных
+- **Скриншоты** структуры — текстовый вывод psql в `HW2/output/`

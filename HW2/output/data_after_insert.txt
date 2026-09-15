@@ -1,0 +1,77 @@
+=== ДАННЫЕ ПОСЛЕ INSERT ===
+
+### SELECT * FROM teams;
+ team_id |    name     |     region     | foundation_date 
+---------+-------------+----------------+-----------------
+       1 | Team Spirit | Eastern Europe | 2015-10-01
+       2 | Team Secret | Western Europe | 2014-11-20
+       3 | PSG.LGD     | China          | 2017-04-09
+       4 | Team Liquid | Western Europe | 2015-05-18
+(4 rows)
+
+
+### SELECT * FROM players;
+ player_id | nickname |   rank   |     region     | registration_date | team_id | mmr 
+-----------+----------+----------+----------------+-------------------+---------+-----
+         1 | Yatoro   | Immortal | Eastern Europe | 2020-01-15        |       1 |    
+         2 | Collapse | Immortal | Eastern Europe | 2020-03-02        |       1 |    
+         3 | Miposhka | Divine   | Eastern Europe | 2018-07-22        |       1 |    
+         4 | Puppey   | Immortal | Western Europe | 2014-12-01        |       2 |    
+         5 | Ame      | Immortal | China          | 2017-05-11        |       3 |    
+(5 rows)
+
+
+### SELECT * FROM heroes;
+ hero_id |      name      |      role      | primary_attribute 
+---------+----------------+----------------+-------------------
+       1 | Invoker        | Mid Laner      | INT
+       2 | Anti-Mage      | Carry          | AGI
+       3 | Pudge          | Support/Roamer | STR
+       4 | Crystal Maiden | Support        | INT
+       5 | Faceless Void  | Carry          | AGI
+(5 rows)
+
+
+### SELECT * FROM matches;
+ match_id | duration_sec | winner_side |   game_mode    | match_date | radiant_team_id | dire_team_id 
+----------+--------------+-------------+----------------+------------+-----------------+--------------
+        1 |         3420 | Radiant     | Captain's Mode | 2024-03-04 |               1 |            2
+        2 |         2775 | Radiant     | Captain's Mode | 2024-03-04 |               2 |            1
+        3 |         3105 | Radiant     | All Pick       | 2024-03-10 |               1 |            3
+        4 |         2900 | Dire        | Captain's Mode | 2024-03-12 |               3 |            4
+(4 rows)
+
+
+### SELECT * FROM items;
+ item_id |        name        | cost |               description               
+---------+--------------------+------+-----------------------------------------
+       1 | Black King Bar     | 4050 | Даёт иммунитет к большинству заклинаний
+       2 | Aghanim's Scepter  | 4200 | Улучшает способности героя
+       3 | Blink Dagger       | 2250 | Телепортация на небольшое расстояние
+       4 | Tango              |   90 | Восстанавливает здоровье, поедая дерево
+       5 | Town Portal Scroll |   50 | Возвращает к фонтану или зданию
+(5 rows)
+
+
+### SELECT * FROM playermatchstats;
+ player_id | match_id | hero_id | kills | deaths | assists | gold_earned | total_xp 
+-----------+----------+---------+-------+--------+---------+-------------+----------
+         1 |        1 |       2 |    12 |      3 |       6 |       28500 |    34000
+         2 |        1 |       1 |     8 |      5 |       9 |       26400 |    31800
+         3 |        1 |       4 |     2 |      6 |      17 |       15700 |    22300
+         4 |        1 |       3 |     5 |      7 |      11 |       19800 |    24700
+         1 |        2 |       1 |    15 |      4 |       8 |       31200 |    36500
+(5 rows)
+
+
+### SELECT * FROM playermatchitems;
+ player_id | match_id | item_id | slot_index 
+-----------+----------+---------+------------
+         1 |        1 |       1 |          1
+         1 |        1 |       2 |          2
+         2 |        1 |       3 |          1
+         4 |        1 |       4 |          1
+         1 |        2 |       1 |          1
+(5 rows)
+
+

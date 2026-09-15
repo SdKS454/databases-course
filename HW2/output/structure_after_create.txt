@@ -1,0 +1,136 @@
+=== СТРУКТУРА ТАБЛИЦ ПОСЛЕ CREATE TABLE ===
+
+### \d+ teams
+                                                                     Table "public.teams"
+     Column      |         Type          | Collation | Nullable |                Default                 | Storage  | Compression | Stats target | Description 
+-----------------+-----------------------+-----------+----------+----------------------------------------+----------+-------------+--------------+-------------
+ team_id         | integer               |           | not null | nextval('teams_team_id_seq'::regclass) | plain    |             |              | 
+ name            | character varying(50) |           | not null |                                        | extended |             |              | 
+ region          | character varying(30) |           |          |                                        | extended |             |              | 
+ foundation_date | date                  |           |          |                                        | plain    |             |              | 
+Indexes:
+    "teams_pkey" PRIMARY KEY, btree (team_id)
+    "teams_name_key" UNIQUE CONSTRAINT, btree (name)
+Referenced by:
+    TABLE "matches" CONSTRAINT "matches_dire_team_id_fkey" FOREIGN KEY (dire_team_id) REFERENCES teams(team_id)
+    TABLE "matches" CONSTRAINT "matches_radiant_team_id_fkey" FOREIGN KEY (radiant_team_id) REFERENCES teams(team_id)
+    TABLE "players" CONSTRAINT "players_team_id_fkey" FOREIGN KEY (team_id) REFERENCES teams(team_id)
+Access method: heap
+
+
+### \d+ players
+                                                                       Table "public.players"
+      Column       |         Type          | Collation | Nullable |                  Default                   | Storage  | Compression | Stats target | Description 
+-------------------+-----------------------+-----------+----------+--------------------------------------------+----------+-------------+--------------+-------------
+ player_id         | integer               |           | not null | nextval('players_player_id_seq'::regclass) | plain    |             |              | 
+ nickname          | character varying(30) |           | not null |                                            | extended |             |              | 
+ rank              | character varying(20) |           | not null |                                            | extended |             |              | 
+ region            | character varying(30) |           |          |                                            | extended |             |              | 
+ registration_date | date                  |           | not null | CURRENT_DATE                               | plain    |             |              | 
+ team_id           | integer               |           |          |                                            | plain    |             |              | 
+Indexes:
+    "players_pkey" PRIMARY KEY, btree (player_id)
+    "players_nickname_key" UNIQUE CONSTRAINT, btree (nickname)
+Foreign-key constraints:
+    "players_team_id_fkey" FOREIGN KEY (team_id) REFERENCES teams(team_id)
+Referenced by:
+    TABLE "playermatchstats" CONSTRAINT "playermatchstats_player_id_fkey" FOREIGN KEY (player_id) REFERENCES players(player_id)
+Access method: heap
+
+
+### \d+ heroes
+                                                                      Table "public.heroes"
+      Column       |         Type          | Collation | Nullable |                 Default                 | Storage  | Compression | Stats target | Description 
+-------------------+-----------------------+-----------+----------+-----------------------------------------+----------+-------------+--------------+-------------
+ hero_id           | integer               |           | not null | nextval('heroes_hero_id_seq'::regclass) | plain    |             |              | 
+ name              | character varying(30) |           | not null |                                         | extended |             |              | 
+ role              | character varying(40) |           |          |                                         | extended |             |              | 
+ primary_attribute | character varying(10) |           | not null |                                         | extended |             |              | 
+Indexes:
+    "heroes_pkey" PRIMARY KEY, btree (hero_id)
+    "heroes_name_key" UNIQUE CONSTRAINT, btree (name)
+Referenced by:
+    TABLE "playermatchstats" CONSTRAINT "playermatchstats_hero_id_fkey" FOREIGN KEY (hero_id) REFERENCES heroes(hero_id)
+Access method: heap
+
+
+### \d+ matches
+                                                                      Table "public.matches"
+     Column      |         Type          | Collation | Nullable |                  Default                  | Storage  | Compression | Stats target | Description 
+-----------------+-----------------------+-----------+----------+-------------------------------------------+----------+-------------+--------------+-------------
+ match_id        | integer               |           | not null | nextval('matches_match_id_seq'::regclass) | plain    |             |              | 
+ duration_sec    | integer               |           | not null |                                           | plain    |             |              | 
+ winner_side     | character varying(7)  |           | not null |                                           | extended |             |              | 
+ game_mode       | character varying(30) |           |          |                                           | extended |             |              | 
+ match_date      | date                  |           | not null | CURRENT_DATE                              | plain    |             |              | 
+ radiant_team_id | integer               |           |          |                                           | plain    |             |              | 
+ dire_team_id    | integer               |           |          |                                           | plain    |             |              | 
+Indexes:
+    "matches_pkey" PRIMARY KEY, btree (match_id)
+Check constraints:
+    "matches_winner_side_check" CHECK (winner_side::text = ANY (ARRAY['Radiant'::character varying, 'Dire'::character varying]::text[]))
+Foreign-key constraints:
+    "matches_dire_team_id_fkey" FOREIGN KEY (dire_team_id) REFERENCES teams(team_id)
+    "matches_radiant_team_id_fkey" FOREIGN KEY (radiant_team_id) REFERENCES teams(team_id)
+Referenced by:
+    TABLE "playermatchstats" CONSTRAINT "playermatchstats_match_id_fkey" FOREIGN KEY (match_id) REFERENCES matches(match_id)
+Access method: heap
+
+
+### \d+ items
+                                                                   Table "public.items"
+   Column    |         Type          | Collation | Nullable |                Default                 | Storage  | Compression | Stats target | Description 
+-------------+-----------------------+-----------+----------+----------------------------------------+----------+-------------+--------------+-------------
+ item_id     | integer               |           | not null | nextval('items_item_id_seq'::regclass) | plain    |             |              | 
+ name        | character varying(40) |           | not null |                                        | extended |             |              | 
+ cost        | integer               |           | not null |                                        | plain    |             |              | 
+ description | text                  |           |          |                                        | extended |             |              | 
+Indexes:
+    "items_pkey" PRIMARY KEY, btree (item_id)
+    "items_name_key" UNIQUE CONSTRAINT, btree (name)
+Check constraints:
+    "items_cost_check" CHECK (cost >= 0)
+Referenced by:
+    TABLE "playermatchitems" CONSTRAINT "playermatchitems_item_id_fkey" FOREIGN KEY (item_id) REFERENCES items(item_id)
+Access method: heap
+
+
+### \d+ playermatchstats
+                                       Table "public.playermatchstats"
+   Column    |  Type   | Collation | Nullable | Default | Storage | Compression | Stats target | Description 
+-------------+---------+-----------+----------+---------+---------+-------------+--------------+-------------
+ player_id   | integer |           | not null |         | plain   |             |              | 
+ match_id    | integer |           | not null |         | plain   |             |              | 
+ hero_id     | integer |           |          |         | plain   |             |              | 
+ kills       | integer |           | not null |         | plain   |             |              | 
+ deaths      | integer |           | not null |         | plain   |             |              | 
+ assists     | integer |           | not null |         | plain   |             |              | 
+ gold_earned | integer |           | not null |         | plain   |             |              | 
+ total_xp    | integer |           | not null |         | plain   |             |              | 
+Indexes:
+    "playermatchstats_pkey" PRIMARY KEY, btree (player_id, match_id)
+Foreign-key constraints:
+    "playermatchstats_hero_id_fkey" FOREIGN KEY (hero_id) REFERENCES heroes(hero_id)
+    "playermatchstats_match_id_fkey" FOREIGN KEY (match_id) REFERENCES matches(match_id)
+    "playermatchstats_player_id_fkey" FOREIGN KEY (player_id) REFERENCES players(player_id)
+Referenced by:
+    TABLE "playermatchitems" CONSTRAINT "playermatchitems_player_id_match_id_fkey" FOREIGN KEY (player_id, match_id) REFERENCES playermatchstats(player_id, match_id)
+Access method: heap
+
+
+### \d+ playermatchitems
+                                        Table "public.playermatchitems"
+     Column     |  Type   | Collation | Nullable | Default | Storage | Compression | Stats target | Description 
+----------------+---------+-----------+----------+---------+---------+-------------+--------------+-------------
+ player_id      | integer |           | not null |         | plain   |             |              | 
+ match_id       | integer |           | not null |         | plain   |             |              | 
+ item_id        | integer |           | not null |         | plain   |             |              | 
+ purchase_order | integer |           | not null |         | plain   |             |              | 
+Indexes:
+    "playermatchitems_pkey" PRIMARY KEY, btree (player_id, match_id, item_id)
+Foreign-key constraints:
+    "playermatchitems_item_id_fkey" FOREIGN KEY (item_id) REFERENCES items(item_id)
+    "playermatchitems_player_id_match_id_fkey" FOREIGN KEY (player_id, match_id) REFERENCES playermatchstats(player_id, match_id)
+Access method: heap
+
+
