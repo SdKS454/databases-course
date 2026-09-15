@@ -133,19 +133,19 @@ UPDATE Players SET mmr = 9800 WHERE mmr IS NULL;
 
 Скриншоты сделаны в pgAdmin 4 (вкладка «Columns» окна Properties каждой таблицы):
 
-![teams](output/screenshots/teams_structure.png)
+![1](output/screenshots/screenshot_1.png)
 
-![players](output/screenshots/players_structure.png)
+![2](output/screenshots/screenshot_2.png)
 
-![heroes](output/screenshots/heroes_structure.png)
+![3](output/screenshots/screenshot_3.png)
 
-![matches](output/screenshots/matches_structure.png)
+![4](output/screenshots/screenshot_4.png)
 
-![items](output/screenshots/items_structure.png)
+![5](output/screenshots/screenshot_5.png)
 
-![playermatchstats](output/screenshots/playermatchstats_structure.png)
+![6](output/screenshots/screenshot_6.png)
 
-![playermatchitems](output/screenshots/playermatchitems_structure.png) |
+![7](output/screenshots/screenshot_7.png)
 
 Оригиналы скриншотов лежат в `output/screenshots/`.
 
