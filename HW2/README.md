@@ -26,7 +26,8 @@ HW2/
     ├── structure_after_create.txt   — структура таблиц после CREATE
     ├── structure_after_alter.txt    — структура таблиц после ALTER
     ├── data_after_insert.txt        — содержимое после INSERT
-    └── data_after_update.txt        — содержимое после UPDATE
+    ├── data_after_update.txt        — содержимое после UPDATE
+    └── screenshots/                 — скриншоты pgAdmin (структура каждой таблицы)
 ```
 
 ## Этап 1. Создание таблиц
@@ -130,9 +131,21 @@ UPDATE Players SET mmr = 9800 WHERE mmr IS NULL;
 
 ## Этап 5. Скриншоты структуры таблиц в СУБД
 
-Текстовый вывод psql (`\d+` и `SELECT *`) сохранён в `output/` — его можно
-вставить в отчёт как скриншоты либо открыть те же таблицы в pgAdmin и сделать
-снимки экрана:
+Скриншоты сделаны в pgAdmin 4 (вкладка «Columns» окна Properties каждой таблицы):
+
+| Таблица | Скриншот |
+|---|---|
+| Teams | ![structure_after_create](output/screenshots/teams_structure.png) |
+| Players | ![players](output/screenshots/players_structure.png) |
+| Heroes | ![heroes](output/screenshots/heroes_structure.png) |
+| Matches | ![matches](output/screenshots/matches_structure.png) |
+| Items | ![items](output/screenshots/items_structure.png) |
+| PlayerMatchStats | ![playermatchstats](output/screenshots/playermatchstats_structure.png) |
+| PlayerMatchItems | ![playermatchitems](output/screenshots/playermatchitems_structure.png) |
+
+Оригиналы скриншотов лежат в `output/screenshots/`.
+
+Дополнительно текстовый вывод psql (`\d+` и `SELECT *`) сохранён в `output/`:
 - `output/structure_after_create.txt` — структура после CREATE TABLE
 - `output/structure_after_alter.txt`  — структура после ALTER TABLE
 - `output/data_after_insert.txt`      — данные после INSERT
