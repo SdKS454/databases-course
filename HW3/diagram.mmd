@@ -1,0 +1,112 @@
+erDiagram
+    REGIONS ||--o{ TEAMS : "регион команды"
+    REGIONS ||--o{ PLAYERS : "регион игрока"
+    TEAMS ||--o{ PLAYERS : "состав"
+    TEAMS ||--o{ MATCHTEAMS : "участие в матче"
+    RANKS ||--o{ PLAYERS : "определяет по MMR"
+
+    ATTRIBUTES ||--o{ HEROES : "первичный атрибут"
+    HEROES ||--o{ HEROROLES : "имеет"
+    ROLES ||--o{ HEROROLES : "роль героя"
+
+    GAMEMODES ||--o{ MATCHES : "режим игры"
+    MATCHES ||--|| MATCHTEAMS : "ровно две стороны"
+    MATCHES ||--o{ PLAYERMATCHSTATS : "участие игроков"
+    PLAYERS ||--o{ PLAYERMATCHSTATS : "выступает"
+    HEROES ||--o{ PLAYERMATCHSTATS : "герой в игре"
+
+    ITEMS ||--o{ PLAYERINVENTORY : "предмет в слоте"
+    PLAYERMATCHSTATS ||--o{ PLAYERINVENTORY : "инвентарь игрока"
+
+    REGIONS {
+        int region_id PK "SERIAL"
+        varchar region_name UK "справочник регионов"
+    }
+
+    RANKS {
+        varchar rank_name PK "Herald..Immortal"
+        int min_mmr UK "нижняя граница"
+        int max_mmr UK "верхняя граница"
+    }
+
+    ATTRIBUTES {
+        varchar attribute_code PK "STR AGI INT"
+        varchar attribute_name "Сила Ловкость Интеллект"
+    }
+
+    ROLES {
+        int role_id PK "SERIAL"
+        varchar role_name UK "Carry Support"
+    }
+
+    GAMEMODES {
+        int game_mode_id PK "SERIAL"
+        varchar mode_name UK "All Pick CM"
+    }
+
+    TEAMS {
+        int team_id PK "SERIAL"
+        varchar name UK "название команды"
+        int region_id FK "больше не хранит region"
+        date foundation_date "дата основания"
+    }
+
+    PLAYERS {
+        int player_id PK "SERIAL"
+        varchar nickname UK "никнейм"
+        int mmr "рейтинг, ранг выводится"
+        int region_id FK "ссылка на справочник"
+        date registration_date "дата регистрации"
+        int team_id FK "ссылка на команду"
+    }
+
+    HEROES {
+        int hero_id PK "SERIAL"
+        varchar name UK "название героя"
+        varchar primary_attribute FK "STR AGI INT"
+    }
+
+    HEROROLES {
+        int hero_id PK "часть ключа"
+        int role_id PK "часть ключа"
+    }
+
+    ITEMS {
+        int item_id PK "SERIAL"
+        varchar name UK "название предмета"
+        int cost "цена в золоте"
+        varchar description "описание"
+    }
+
+    MATCHES {
+        int match_id PK "SERIAL"
+        int duration_sec "длительность"
+        int game_mode_id FK "режим игры"
+        date match_date "дата матча"
+    }
+
+    MATCHTEAMS {
+        int match_id PK "matч и команда"
+        int team_id PK "matч и команда"
+        varchar side UK "Radiant или Dire"
+        boolean is_winner "ровно один TRUE"
+    }
+
+    PLAYERMATCHSTATS {
+        int player_id PK "часть ключа"
+        int match_id PK "часть ключа"
+        int hero_id FK "герой в этом матче"
+        int kills "убийства"
+        int deaths "смерти"
+        int assists "ассисты"
+        int gold_earned "золото"
+        int total_xp "опыт"
+    }
+
+    PLAYERINVENTORY {
+        int player_id PK "часть ключа"
+        int match_id PK "часть ключа"
+        int slot_index PK "слот 1-6 определяет предмет"
+        int item_id UK "больше не часть ключа"
+        int purchase_time_sec "момент покупки"
+    }
