@@ -1,0 +1,174 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tax Service</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --danger-bg: #fee2e2;
+            --danger-text: #991b1b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+        }
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .topbar {
+            background: #1f2937;
+            color: #fff;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+        .brand {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: .01em;
+        }
+        .topbar-note { color: #bfdbfe; font-size: 13px; }
+        main { max-width: 960px; margin: 36px auto; padding: 0 16px; }
+        .page-heading { margin-bottom: 24px; }
+        .page-heading h1 { margin: 0 0 6px; font-size: 30px; }
+        .page-heading p { margin: 0; color: var(--muted); }
+        .grid {
+            display: grid;
+            grid-template-columns: minmax(260px, .8fr) minmax(0, 1.6fr);
+            gap: 20px;
+            align-items: start;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .06);
+            padding: 24px;
+        }
+        .card h2 { margin: 0 0 18px; font-size: 20px; }
+        .current-label, .muted { color: var(--muted); font-size: 14px; }
+        .current {
+            color: var(--primary);
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin: 6px 0 10px;
+        }
+        .rate-note { color: var(--muted); font-size: 13px; line-height: 1.5; }
+        .alert {
+            background: var(--danger-bg);
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            color: var(--danger-text);
+            margin-bottom: 20px;
+            padding: 12px 14px;
+        }
+        label { color: #374151; display: block; font-size: 14px; margin-bottom: 7px; }
+        .form-row { display: flex; gap: 8px; }
+        input[type=text] {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            flex: 1;
+            font-size: 16px;
+            min-width: 0;
+            padding: 10px 12px;
+        }
+        input[type=text]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+            outline: none;
+        }
+        input[type=password] {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            display: block;
+            font-size: 16px;
+            margin-bottom: 16px;
+            padding: 10px 12px;
+            width: 100%;
+        }
+        input[type=password]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+            outline: none;
+        }
+        button, .button {
+            background: var(--primary);
+            border: 0;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            display: inline-block;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 10px 18px;
+        }
+        button:hover, .button:hover { background: var(--primary-dark); text-decoration: none; }
+        .button-secondary {
+            background: #eef2ff;
+            color: #1d4ed8;
+        }
+        .button-secondary:hover { background: #dbeafe; }
+        .table-wrap { overflow-x: auto; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border-bottom: 1px solid var(--border); padding: 13px 10px; text-align: left; }
+        th { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; }
+        tbody tr:last-child td { border-bottom: 0; }
+        .amount { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .empty { color: var(--muted); padding: 18px 0 4px; }
+        .success {
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            color: #166534;
+            margin-bottom: 20px;
+            padding: 12px 14px;
+        }
+        .auth-card { max-width: 480px; }
+        .auth-card label { margin-top: 15px; }
+        .auth-card label:first-of-type { margin-top: 0; }
+        .auth-link { color: var(--muted); font-size: 14px; margin-bottom: 0; }
+        .back-link { display: inline-block; margin-top: 18px; }
+        footer { color: var(--muted); font-size: 13px; margin: 0 auto 28px; max-width: 960px; padding: 0 16px; }
+        @media (max-width: 700px) {
+            .topbar { padding: 13px 16px; }
+            main { margin-top: 24px; }
+            .grid { grid-template-columns: 1fr; }
+            .form-row { align-items: stretch; flex-direction: column; }
+            .page-heading h1 { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="${pageContext.request.contextPath}/tax-payments">Tax Service</a>
+    <span class="topbar-note">
+        Учет расходов и расчет налога
+        <c:if test="${not empty sessionScope.authenticatedUser}">
+            · <strong>${fn:escapeXml(sessionScope.authenticatedUser.firstName)}
+            ${fn:escapeXml(fn:substring(sessionScope.authenticatedUser.lastName, 0, 1))}.
+            ${fn:escapeXml(fn:substring(sessionScope.authenticatedUser.patronymic, 0, 1))}.</strong>
+            <a href="${pageContext.request.contextPath}/logout"
+               style="color:#bfdbfe; margin-left:10px;">Выйти</a>
+        </c:if>
+    </span>
+</header>
+<main>
