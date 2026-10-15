@@ -1,0 +1,241 @@
+==============================================================================
+HW5. Реальный вывод PostgreSQL для запросов из queries.sql
+==============================================================================
+
+-- 1.1. Агрегатные функции COUNT(), SUM(), AVG(), MIN(), MAX()
+
+SELECT count(*)                    AS stat_rows,
+       count(DISTINCT s.match_id)  AS matches_played,
+       count(DISTINCT s.player_id) AS players,
+       sum(s.kills)                AS total_kills,
+       round(avg(s.kills), 2)      AS avg_kills,
+       min(s.deaths)               AS min_deaths,
+       max(s.deaths)               AS max_deaths,
+       sum(s.gold_earned)          AS total_gold,
+       min(s.gold_earned)          AS min_gold,
+       max(s.gold_earned)          AS max_gold,
+       round(avg(s.total_xp))      AS avg_xp
+FROM nf.PlayerMatchStats s;
+
+ stat_rows | matches_played | players | total_kills | avg_kills | min_deaths | max_deaths | total_gold | min_gold | max_gold | avg_xp
+-----------+----------------+---------+-------------+-----------+------------+------------+------------+----------+----------+--------
+         5 |              2 |       4 |          43 |      8.60 |          3 |          7 |     121600 |    15700 |    31200 |  29860
+(1 row)
+
+-- 1.2. STRING_AGG — склейка значений в одну строку
+
+SELECT t.name                                            AS team_name,
+       count(p.player_id)                                AS players_count,
+       min(p.mmr)                                        AS min_mmr,
+       max(p.mmr)                                        AS max_mmr,
+       round(avg(p.mmr))                                 AS avg_mmr,
+       string_agg(p.nickname, ', ' ORDER BY p.nickname)  AS roster
+FROM nf.Teams t
+LEFT JOIN nf.Players p ON p.team_id = t.team_id
+GROUP BY t.team_id, t.name
+ORDER BY t.name;
+
+ team_name   | players_count | min_mmr | max_mmr | avg_mmr | roster
+-------------+---------------+---------+---------+---------+----------------------------
+ PSG.LGD     |             1 |    9800 |    9800 |    9800 | Ame
+ Team Liquid |             0 |         |         |         |
+ Team Secret |             1 |    9800 |    9800 |    9800 | Puppey
+ Team Spirit |             3 |    9800 |   12500 |   10700 | Collapse, Miposhka, Yatoro
+(4 rows)
+
+-- 2.1. GROUP BY — агрегаты по группам
+
+SELECT t.name                        AS team_name,
+       count(*)                      AS stat_rows,
+       count(DISTINCT p.player_id)   AS players,
+       sum(s.kills)                  AS total_kills,
+       sum(s.deaths)                 AS total_deaths,
+       round(avg(s.kills), 2)        AS avg_kills,
+       sum(s.gold_earned)            AS total_gold
+FROM nf.PlayerMatchStats s
+JOIN nf.Players p ON p.player_id = s.player_id
+JOIN nf.Teams   t ON t.team_id   = p.team_id
+GROUP BY t.team_id, t.name
+ORDER BY total_kills DESC, t.name;
+
+ team_name   | stat_rows | players | total_kills | total_deaths | avg_kills | total_gold
+-------------+-----------+---------+-------------+--------------+-----------+------------
+ Team Spirit |         4 |       3 |          38 |           18 |      9.50 |     101800
+ Team Secret |         1 |       1 |           5 |            7 |      5.00 |      19800
+(2 rows)
+
+-- 2.2. GROUP BY + HAVING — фильтр готовых групп
+
+SELECT h.name                    AS hero_name,
+       a.attribute_name          AS attribute,
+       count(*)                  AS games_played,
+       sum(s.kills)              AS total_kills,
+       round(avg(s.kills), 1)    AS avg_kills,
+       round(avg(s.gold_earned)) AS avg_gold
+FROM nf.PlayerMatchStats s
+JOIN nf.Heroes     h ON h.hero_id        = s.hero_id
+JOIN nf.Attributes a ON a.attribute_code = h.primary_attribute
+GROUP BY h.hero_id, h.name, a.attribute_name
+HAVING round(avg(s.kills), 1) >= 8
+ORDER BY avg_kills DESC, total_kills DESC, h.name;
+
+ hero_name | attribute | games_played | total_kills | avg_kills | avg_gold
+-----------+-----------+--------------+-------------+-----------+----------
+ Invoker   | Интеллект |            2 |          24 |      12.0 |    28800
+ Anti-Mage | Ловкость  |            1 |          12 |      12.0 |    28500
+(2 rows)
+
+-- 3.1. ROLLUP — промежуточные итоги «сверху вниз»
+
+SELECT CASE
+           WHEN grouping(r.region_name) = 1
+            AND grouping(t.name) = 1 THEN 'ВСЕ РЕГИОНЫ'
+           WHEN grouping(t.name) = 1
+                THEN 'ВСЕ КОМАНДЫ: ' || r.region_name
+           ELSE r.region_name
+       END                          AS region_or_total,
+       CASE WHEN grouping(t.name) = 1
+            THEN '(итог)' ELSE t.name END AS team_or_total,
+       grouping(r.region_name)     AS g_region,
+       grouping(t.name)            AS g_team,
+       count(*)                    AS stat_rows,
+       sum(s.kills)                AS total_kills,
+       round(avg(s.kills), 1)      AS avg_kills,
+       sum(s.gold_earned)          AS total_gold
+FROM nf.PlayerMatchStats s
+JOIN nf.Players p ON p.player_id = s.player_id
+JOIN nf.Teams   t ON t.team_id   = p.team_id
+JOIN nf.Regions r ON r.region_id = t.region_id
+GROUP BY ROLLUP (r.region_name, t.name)
+ORDER BY grouping(r.region_name), r.region_name NULLS LAST,
+         grouping(t.name),        t.name NULLS LAST;
+
+ region_or_total             | team_or_total | g_region | g_team | stat_rows | total_kills | avg_kills | total_gold
+-----------------------------+---------------+----------+--------+-----------+-------------+-----------+------------
+ Eastern Europe              | Team Spirit   |        0 |      0 |         4 |          38 |       9.5 |     101800
+ ВСЕ КОМАНДЫ: Eastern Europe | (итог)        |        0 |      1 |         4 |          38 |       9.5 |     101800
+ Western Europe              | Team Secret   |        0 |      0 |         1 |           5 |       5.0 |      19800
+ ВСЕ КОМАНДЫ: Western Europe | (итог)        |        0 |      1 |         1 |           5 |       5.0 |      19800
+ ВСЕ РЕГИОНЫ                 | (итог)        |        1 |      1 |         5 |          43 |       8.6 |     121600
+(5 rows)
+
+-- 3.2. CUBE — все комбинации измерений
+
+SELECT CASE
+           WHEN grouping(gm.mode_name) = 1
+            AND grouping(a.attribute_name) = 1
+                THEN 'ВСЕ РЕЖИМЫ И АТРИБУТЫ'
+           WHEN grouping(a.attribute_name) = 1 THEN 'все атрибуты'
+           WHEN grouping(gm.mode_name) = 1    THEN 'все режимы'
+           ELSE gm.mode_name
+       END                                 AS mode_or_total,
+       CASE WHEN grouping(a.attribute_name) = 1
+            THEN '(итог)' ELSE a.attribute_name END AS attribute_or_total,
+       grouping(gm.mode_name)              AS g_mode,
+       grouping(a.attribute_name)          AS g_attribute,
+       count(*)                            AS stat_rows,
+       sum(s.kills)                        AS total_kills,
+       sum(s.gold_earned)                  AS total_gold
+FROM nf.PlayerMatchStats s
+JOIN nf.Matches   m  ON m.match_id      = s.match_id
+JOIN nf.GameModes gm ON gm.game_mode_id = m.game_mode_id
+JOIN nf.Heroes    h  ON h.hero_id       = s.hero_id
+JOIN nf.Attributes a  ON a.attribute_code = h.primary_attribute
+GROUP BY CUBE (gm.mode_name, a.attribute_name)
+ORDER BY grouping(gm.mode_name),    gm.mode_name NULLS LAST,
+         grouping(a.attribute_name), a.attribute_name NULLS LAST;
+
+ mode_or_total         | attribute_or_total | g_mode | g_attribute | stat_rows | total_kills | total_gold
+-----------------------+--------------------+--------+-------------+-----------+-------------+------------
+ All Pick              | Интеллект          |      0 |           0 |         1 |          15 |      31200
+ все атрибуты          | (итог)             |      0 |           1 |         1 |          15 |      31200
+ Captain's Mode        | Интеллект          |      0 |           0 |         2 |          11 |      42100
+ Captain's Mode        | Ловкость           |      0 |           0 |         1 |          12 |      28500
+ Captain's Mode        | Сила               |      0 |           0 |         1 |           5 |      19800
+ все атрибуты          | (итог)             |      0 |           1 |         4 |          28 |      90400
+ все режимы            | Интеллект          |      1 |           0 |         3 |          26 |      73300
+ все режимы            | Ловкость           |      1 |           0 |         1 |          12 |      28500
+ все режимы            | Сила               |      1 |           0 |         1 |           5 |      19800
+ ВСЕ РЕЖИМЫ И АТРИБУТЫ | (итог)             |      1 |           1 |         5 |          43 |     121600
+(10 rows)
+
+-- 3.2 (тот же отчёт, записанный явно через GROUPING SETS).
+
+SELECT COALESCE(gm.mode_name, 'все режимы')       AS mode_or_total,
+       COALESCE(a.attribute_name, 'все атрибуты') AS attribute_or_total,
+       count(*)      AS stat_rows,
+       sum(s.kills)  AS total_kills,
+       sum(s.gold_earned) AS total_gold
+FROM nf.PlayerMatchStats s
+JOIN nf.Matches   m  ON m.match_id      = s.match_id
+JOIN nf.GameModes gm ON gm.game_mode_id = m.game_mode_id
+JOIN nf.Heroes    h  ON h.hero_id       = s.hero_id
+JOIN nf.Attributes a  ON a.attribute_code = h.primary_attribute
+GROUP BY GROUPING SETS (
+    (gm.mode_name, a.attribute_name),
+    (gm.mode_name),
+    (a.attribute_name),
+    ()
+)
+ORDER BY 1, 2;
+
+ mode_or_total  | attribute_or_total | stat_rows | total_kills | total_gold
+----------------+--------------------+-----------+-------------+------------
+ All Pick       | Интеллект          |         1 |          15 |      31200
+ All Pick       | все атрибуты       |         1 |          15 |      31200
+ Captain's Mode | Интеллект          |         2 |          11 |      42100
+ Captain's Mode | Ловкость           |         1 |          12 |      28500
+ Captain's Mode | Сила               |         1 |           5 |      19800
+ Captain's Mode | все атрибуты       |         4 |          28 |      90400
+ все режимы     | Интеллект          |         3 |          26 |      73300
+ все режимы     | Ловкость           |         1 |          12 |      28500
+ все режимы     | Сила               |         1 |           5 |      19800
+ все режимы     | все атрибуты       |         5 |          43 |     121600
+(10 rows)
+
+-- 4.1. SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY
+
+SELECT t.name                    AS team_name,
+       r.region_name             AS region,
+       count(*)                  AS stat_rows,
+       sum(s.kills)              AS total_kills,
+       sum(s.deaths)             AS total_deaths,
+       sum(s.gold_earned)        AS total_gold,
+       round(avg(s.gold_earned)) AS avg_gold
+FROM nf.Teams t
+JOIN nf.Regions r ON r.region_id = t.region_id
+JOIN nf.Players p ON p.team_id   = t.team_id
+JOIN nf.PlayerMatchStats s ON s.player_id = p.player_id
+WHERE s.kills >= 5
+GROUP BY t.team_id, t.name, r.region_name
+HAVING sum(s.kills) >= 5
+ORDER BY total_gold DESC, t.name;
+
+ team_name   | region         | stat_rows | total_kills | total_deaths | total_gold | avg_gold
+-------------+----------------+-----------+-------------+--------------+------------+----------
+ Team Spirit | Eastern Europe |         3 |          36 |           12 |      86100 |    28700
+ Team Secret | Western Europe |         1 |           5 |            7 |      19800 |    19800
+(2 rows)
+
+-- 4.2. SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY
+
+SELECT p.nickname                       AS nickname,
+       count(*)                         AS matches_played,
+       sum(s.kills)                     AS total_kills,
+       sum(s.deaths)                    AS total_deaths,
+       sum(s.kills) - sum(s.deaths)     AS kd_diff,
+       sum(s.assists)                   AS total_assists,
+       sum(s.gold_earned)               AS total_gold,
+       round(avg(s.total_xp))           AS avg_xp
+FROM nf.PlayerMatchStats s
+JOIN nf.Players p ON p.player_id = s.player_id
+WHERE s.kills >= s.deaths
+GROUP BY p.player_id, p.nickname
+HAVING sum(s.gold_earned) >= 25000
+ORDER BY kd_diff DESC, total_gold DESC, p.nickname;
+
+ nickname | matches_played | total_kills | total_deaths | kd_diff | total_assists | total_gold | avg_xp
+----------+----------------+-------------+--------------+---------+---------------+------------+--------
+ Yatoro   |              2 |          27 |            7 |      20 |            14 |      59700 |  35250
+ Collapse |              1 |           9 |            5 |       4 |             9 |      26400 |  31800
+(2 rows)
