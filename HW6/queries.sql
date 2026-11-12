@@ -1,0 +1,256 @@
+-- HW6. Подзапросы. Dota 2, нормализованная схема nf из HW3.
+-- 23 запроса: по 2 на 9 типов + 5 дополнительных коррелированных.
+-- Проверено на PostgreSQL 16.15, на данных HW2 -> HW3.
+-- Для pgAdmin: открыть этот файл в Query Tool нужной базы.
+-- Можно выполнять целиком или выделять отдельный запрос с комментарием.
+-- Все таблицы указаны со схемой nf; SET search_path не требуется.
+-- Скрипт только читает данные, не создаёт и не изменяет таблицы.
+-- Если nf отсутствует, порядок подготовки описан в sub_queries.md.
+
+-- 1.1. SELECT — количество игроков команды
+-- Вывести все команды и число игроков в каждой, включая команды без игроков.
+SELECT t.name AS team_name,
+       (SELECT count(*)
+        FROM nf.Players p
+        WHERE p.team_id = t.team_id) AS players_count
+FROM nf.Teams t
+ORDER BY t.name;
+
+-- 1.2. SELECT — отклонение цены от средней
+-- Для каждого предмета показать цену и её отклонение от средней цены всех предметов.
+SELECT i.name AS item_name,
+       i.cost,
+       round(i.cost - (SELECT avg(i2.cost) FROM nf.Items i2), 2) AS cost_diff
+FROM nf.Items i
+ORDER BY i.name;
+
+-- 2.1. FROM — статистика составов команд
+-- Вывести команды, у которых не меньше двух игроков, с количеством игроков и средним MMR.
+SELECT t.name AS team_name,
+       team_stats.players_count,
+       round(team_stats.avg_mmr, 2) AS avg_mmr
+FROM (
+    SELECT p.team_id, count(*) AS players_count, avg(p.mmr) AS avg_mmr
+    FROM nf.Players p
+    GROUP BY p.team_id
+) AS team_stats
+JOIN nf.Teams t ON t.team_id = team_stats.team_id
+WHERE team_stats.players_count >= 2
+ORDER BY t.name;
+
+-- 2.2. FROM — результативные герои
+-- Показать героев со средним числом убийств за записанное выступление не меньше 10.
+SELECT h.name AS hero_name,
+       hero_stats.stat_rows,
+       round(hero_stats.avg_kills, 2) AS avg_kills
+FROM (
+    SELECT s.hero_id, count(*) AS stat_rows, avg(s.kills) AS avg_kills
+    FROM nf.PlayerMatchStats s
+    GROUP BY s.hero_id
+) AS hero_stats
+JOIN nf.Heroes h ON h.hero_id = hero_stats.hero_id
+WHERE hero_stats.avg_kills >= 10
+ORDER BY h.name;
+
+-- 3.1. WHERE — игроки выше среднего MMR
+-- Найти игроков, чей MMR выше среднего MMR всех игроков.
+SELECT p.nickname, p.mmr
+FROM nf.Players p
+WHERE p.mmr > (SELECT avg(p2.mmr) FROM nf.Players p2)
+ORDER BY p.mmr DESC, p.nickname;
+
+-- 3.2. WHERE — предметы дороже среднего
+-- Найти предметы, цена которых выше средней цены всех предметов.
+SELECT i.name AS item_name, i.cost
+FROM nf.Items i
+WHERE i.cost > (SELECT avg(i2.cost) FROM nf.Items i2)
+ORDER BY i.cost DESC, i.name;
+
+-- 4.1. HAVING — команды с высоким средним MMR
+-- Найти команды, средний MMR игроков которых выше среднего MMR по всем игрокам.
+SELECT t.name AS team_name,
+       round(avg(p.mmr), 2) AS avg_mmr
+FROM nf.Teams t
+JOIN nf.Players p ON p.team_id = t.team_id
+GROUP BY t.team_id, t.name
+HAVING avg(p.mmr) > (SELECT avg(p2.mmr) FROM nf.Players p2)
+ORDER BY t.name;
+
+-- 4.2. HAVING — герои с большой суммой убийств
+-- Найти героев, сумма убийств на которых выше средней суммы убийств по использованным героям.
+SELECT h.name AS hero_name,
+       sum(s.kills) AS total_kills
+FROM nf.Heroes h
+JOIN nf.PlayerMatchStats s ON s.hero_id = h.hero_id
+GROUP BY h.hero_id, h.name
+HAVING sum(s.kills) > (
+    SELECT avg(hero_totals.total_kills)
+    FROM (
+        SELECT sum(s2.kills) AS total_kills
+        FROM nf.PlayerMatchStats s2
+        GROUP BY s2.hero_id
+    ) AS hero_totals
+)
+ORDER BY total_kills DESC, h.name;
+
+-- 5.1. ALL — максимальный MMR
+-- Найти всех игроков с максимальным MMR, сохраняя возможные ничьи.
+SELECT p.nickname, p.mmr
+FROM nf.Players p
+WHERE p.mmr >= ALL (SELECT p2.mmr FROM nf.Players p2)
+ORDER BY p.nickname;
+
+-- 5.2. ALL — дороже всех бюджетных предметов
+-- Найти предметы дороже каждого предмета с ценой меньше 1000 золота.
+SELECT i.name AS item_name, i.cost
+FROM nf.Items i
+WHERE i.cost > ALL (
+    SELECT cheap.cost
+    FROM nf.Items cheap
+    WHERE cheap.cost < 1000
+)
+ORDER BY i.cost DESC, i.name;
+
+-- 6.1. IN — команды с сильными игроками
+-- Найти команды, в которых есть игроки с MMR не меньше 10000.
+SELECT t.name AS team_name
+FROM nf.Teams t
+WHERE t.team_id IN (
+    SELECT p.team_id
+    FROM nf.Players p
+    WHERE p.mmr >= 10000 AND p.team_id IS NOT NULL
+)
+ORDER BY t.name;
+
+-- 6.2. IN — герои поддержки
+-- Найти героев, у которых среди ролей есть Support.
+SELECT h.name AS hero_name
+FROM nf.Heroes h
+WHERE h.hero_id IN (
+    SELECT hr.hero_id
+    FROM nf.HeroRoles hr
+    JOIN nf.Roles r ON r.role_id = hr.role_id
+    WHERE r.role_name = 'Support'
+)
+ORDER BY h.name;
+
+-- 7.1. ANY — игроки с результативным выступлением
+-- Найти игроков, у которых есть хотя бы одно выступление с 10 убийствами или больше.
+SELECT p.nickname
+FROM nf.Players p
+WHERE p.player_id = ANY (
+    SELECT s.player_id
+    FROM nf.PlayerMatchStats s
+    WHERE s.kills >= 10
+)
+ORDER BY p.nickname;
+
+-- 7.2. ANY — сравнение с дорогими предметами
+-- Найти предметы дороже хотя бы одного предмета стоимостью не меньше 4000 золота.
+SELECT i.name AS item_name, i.cost
+FROM nf.Items i
+WHERE i.cost > ANY (
+    SELECT expensive.cost
+    FROM nf.Items expensive
+    WHERE expensive.cost >= 4000
+)
+ORDER BY i.cost DESC, i.name;
+
+-- 8.1. EXISTS — команды с игроками
+-- Найти команды, у которых есть хотя бы один игрок.
+SELECT t.name AS team_name
+FROM nf.Teams t
+WHERE EXISTS (
+    SELECT 1
+    FROM nf.Players p
+    WHERE p.team_id = t.team_id
+)
+ORDER BY t.name;
+
+-- 8.2. NOT EXISTS — неиспользованные герои
+-- Найти героев, для которых нет ни одной записи статистики.
+SELECT h.name AS hero_name
+FROM nf.Heroes h
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM nf.PlayerMatchStats s
+    WHERE s.hero_id = h.hero_id
+)
+ORDER BY h.name;
+
+-- 9.1. Несколько столбцов — выступления с покупками
+-- Вывести записи статистики, для которых в инвентаре есть хотя бы один предмет именно этого игрока именно в этом матче.
+SELECT p.nickname, s.match_id, s.kills
+FROM nf.PlayerMatchStats s
+JOIN nf.Players p ON p.player_id = s.player_id
+WHERE (s.player_id, s.match_id) IN (
+    SELECT pi.player_id, pi.match_id
+    FROM nf.PlayerInventory pi
+)
+ORDER BY p.nickname, s.match_id;
+
+-- 9.2. Несколько столбцов — рекорды на каждом герое
+-- Найти выступления с максимальным числом убийств для соответствующего героя; при равенстве сохранить все.
+SELECT h.name AS hero_name, p.nickname, s.match_id, s.kills
+FROM nf.PlayerMatchStats s
+JOIN nf.Heroes h ON h.hero_id = s.hero_id
+JOIN nf.Players p ON p.player_id = s.player_id
+WHERE (s.hero_id, s.kills) IN (
+    SELECT s2.hero_id, max(s2.kills)
+    FROM nf.PlayerMatchStats s2
+    GROUP BY s2.hero_id
+)
+ORDER BY h.name, p.nickname, s.match_id;
+
+-- 10.1. Коррелированный — MMR выше среднего своей команды
+-- Найти игроков, чей MMR выше среднего MMR игроков их собственной команды.
+SELECT p.nickname, t.name AS team_name, p.mmr
+FROM nf.Players p
+JOIN nf.Teams t ON t.team_id = p.team_id
+WHERE p.mmr > (
+    SELECT avg(teammate.mmr)
+    FROM nf.Players teammate
+    WHERE teammate.team_id = p.team_id
+)
+ORDER BY t.name, p.nickname;
+
+-- 10.2. Коррелированный — число побед команды
+-- Вывести все команды и число их побед по таблице участников матчей.
+SELECT t.name AS team_name,
+       (SELECT count(*)
+        FROM nf.MatchTeams mt
+        WHERE mt.team_id = t.team_id AND mt.is_winner) AS wins
+FROM nf.Teams t
+ORDER BY wins DESC, t.name;
+
+-- 10.3. Коррелированный — лучший результат в каждом матче
+-- Найти игроков с максимальным числом убийств среди имеющихся записей статистики каждого матча.
+SELECT s.match_id, p.nickname, s.kills
+FROM nf.PlayerMatchStats s
+JOIN nf.Players p ON p.player_id = s.player_id
+WHERE s.kills = (
+    SELECT max(other.kills)
+    FROM nf.PlayerMatchStats other
+    WHERE other.match_id = s.match_id
+)
+ORDER BY s.match_id, p.nickname;
+
+-- 10.4. Коррелированный — игроки без статистики
+-- Найти игроков, у которых нет ни одной записи индивидуальной статистики.
+SELECT p.nickname
+FROM nf.Players p
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM nf.PlayerMatchStats s
+    WHERE s.player_id = p.player_id
+)
+ORDER BY p.nickname;
+
+-- 10.5. Коррелированный — число покупок каждого предмета
+-- Вывести все предметы с количеством записей их покупки в инвентаре, включая ни разу не купленные.
+SELECT i.name AS item_name,
+       (SELECT count(*)
+        FROM nf.PlayerInventory pi
+        WHERE pi.item_id = i.item_id) AS purchases_count
+FROM nf.Items i
+ORDER BY purchases_count DESC, i.name;
