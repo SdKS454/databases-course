@@ -1,0 +1,27 @@
+12_rc_repeat_b: READ COMMITTED: повторное чтение, MMR игрока
+Source: actual PostgreSQL execution, two independent connections when needed.
+PostgreSQL 17.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+STEP 1 [T1]
+BEGIN ISOLATION LEVEL READ COMMITTED;
+SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_12_Player';
+{"status": "BEGIN"}
+{"columns": ["mmr"], "rows": [[8000]]}
+
+STEP 2 [T2]
+BEGIN;
+UPDATE nf.Players SET mmr = 8100 WHERE nickname = 'HW7_TX_12_Player';
+COMMIT;
+{"status": "BEGIN"}
+{"status": "UPDATE 1"}
+{"status": "COMMIT"}
+
+STEP 3 [T1]
+SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_12_Player';
+{"columns": ["mmr"], "rows": [[8100]]}
+
+STEP 4 [T1]
+COMMIT;
+SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_12_Player';
+{"status": "COMMIT"}
+{"columns": ["mmr"], "rows": [[8100]]}

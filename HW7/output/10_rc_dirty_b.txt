@@ -1,0 +1,31 @@
+10_rc_dirty_b: READ COMMITTED: грязное чтение, MMR игрока
+Source: actual PostgreSQL execution, two independent connections when needed.
+PostgreSQL 17.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+STEP 1 [T1]
+BEGIN;
+UPDATE nf.Players SET mmr = 9000 WHERE nickname = 'HW7_TX_10_Player';
+{"status": "BEGIN"}
+{"status": "UPDATE 1"}
+
+STEP 2 [T2]
+BEGIN ISOLATION LEVEL READ COMMITTED;
+SHOW transaction_isolation;
+{"status": "BEGIN"}
+{"columns": ["transaction_isolation"], "rows": [["read committed"]]}
+
+STEP 3 [T2]
+SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_10_Player';
+{"columns": ["mmr"], "rows": [[8000]]}
+
+STEP 4 [T1]
+COMMIT;
+{"status": "COMMIT"}
+
+STEP 5 [T2]
+SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_10_Player';
+{"columns": ["mmr"], "rows": [[9000]]}
+
+STEP 6 [T2]
+COMMIT;
+{"status": "COMMIT"}

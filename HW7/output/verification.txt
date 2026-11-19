@@ -1,0 +1,7 @@
+PostgreSQL 17.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+Scenarios passed: 24/24
+Preparation repeated: PASS
+Original rows of all 14 nf tables unchanged: PASS
+Cleanup restores original table data: PASS
+Cleanup repeated: PASS
+Sequences are not reset and are not included in the row comparison.

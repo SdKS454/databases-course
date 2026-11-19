@@ -1,0 +1,27 @@
+15_rr_repeat_a: REPEATABLE READ: повторное чтение, цена предмета
+Source: actual PostgreSQL execution, two independent connections when needed.
+PostgreSQL 17.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+STEP 1 [T1]
+BEGIN ISOLATION LEVEL REPEATABLE READ;
+SELECT cost FROM nf.Items WHERE name = 'HW7_TX_15_Item';
+{"status": "BEGIN"}
+{"columns": ["cost"], "rows": [[100]]}
+
+STEP 2 [T2]
+BEGIN;
+UPDATE nf.Items SET cost = 150 WHERE name = 'HW7_TX_15_Item';
+COMMIT;
+{"status": "BEGIN"}
+{"status": "UPDATE 1"}
+{"status": "COMMIT"}
+
+STEP 3 [T1]
+SELECT cost FROM nf.Items WHERE name = 'HW7_TX_15_Item';
+{"columns": ["cost"], "rows": [[100]]}
+
+STEP 4 [T1]
+COMMIT;
+SELECT cost FROM nf.Items WHERE name = 'HW7_TX_15_Item';
+{"status": "COMMIT"}
+{"columns": ["cost"], "rows": [[150]]}
