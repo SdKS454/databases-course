@@ -4,7 +4,8 @@
 **Схема данных:** `nf` из HW3, с данными HW2 и дополнениями HW6.\
 **Презентация:** «10. Транзакции», слайды 31–35.\
 **Срок на слайде:** до 20.11.\
-**Локальная проверка:** PostgreSQL 17.10, все 24 сценария выполнены успешно.
+**Автоматическая проверка:** PostgreSQL 17.10, все 24 сценария выполнены успешно.\
+**Ручной прогон:** PostgreSQL 18, pgAdmin; приложены 117 предоставленных снимков.
 
 ## Состав работы
 
@@ -75,8 +76,8 @@
    Нельзя запускать оба файла целиком: порядок между сессиями является частью опыта.
 6. Ожидаемую ошибку выполняю отдельным запуском. Следующий ROLLBACK также выделяю
    и выполняю отдельно, иначе клиент может остановить отправку после ошибки.
-7. Снимаю результаты в pgAdmin. Места для собственных фотографий указаны в конце
-   каждого сценария; инструкции и имена файлов — в [screenshots/README.md](screenshots/README.md).
+7. Результаты ручного прогона в pgAdmin приведены в конце каждого сценария.
+   Полный индекс снимков — [screenshots/README.md](screenshots/README.md).
 8. После окончания всех опытов при желании выполняю [99_cleanup.sql](99_cleanup.sql).
 
 SQL не содержит команд psql. Во всех таблицах явно указана схема `nf`.
@@ -106,9 +107,12 @@ MMR каждого начального демонстрационного иг�
 дата основания демонстрационных команд — 2000-01-01.
 Эти значения не зависят от актуального MMR Yatoro и других исходных строк.
 
-Ниже приведены **фактические результаты локального выполнения**, а не фотографии
-pgAdmin. Фотографии добавляются после ручного прогона. Полные протоколы всех
-шагов сохранены в [output](output/); сводка — [verification.txt](output/verification.txt).
+Таблицы результатов ниже относятся к **автоматической проверке на PostgreSQL 17.10**.
+Фотографии в конце каждого опыта показывают отдельный ручной прогон в pgAdmin
+на PostgreSQL 18. Полные локальные протоколы сохранены в [output](output/),
+сводка — [verification.txt](output/verification.txt). Изображения сохранены без изменения
+пикселей. На некоторых снимках виден только последний результат нескольких SELECT
+или обрезанная по ширине часть запроса; полные SQL-блоки остаются в тексте отчёта.
 
 ## 1. Базовые операции с транзакциями — 6 сценариев
 
@@ -168,7 +172,32 @@ SELECT count(*) AS new_players FROM nf.Players WHERE nickname = 'HW7_TX_01_NewPl
 
 **Вывод:** Изменения обеих таблиц сохранены.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `01_commit_a_1.png` и `01_commit_a_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 5</summary>
+
+1. Исходная проверка: новых игроков 0.
+
+![01_commit_a: Исходная проверка: новых игроков 0.](screenshots/01_commit_a_1.png)
+
+2. Повторная проверка исходного состояния.
+
+![01_commit_a: Повторная проверка исходного состояния.](screenshots/01_commit_a_2.png)
+
+3. INSERT игрока и UPDATE даты команды.
+
+![01_commit_a: INSERT игрока и UPDATE даты команды.](screenshots/01_commit_a_3.png)
+
+4. Внутри транзакции новый игрок уже виден.
+
+![01_commit_a: Внутри транзакции новый игрок уже виден.](screenshots/01_commit_a_4.png)
+
+5. Контроль сохранённых данных: дата 2026-11-19, новый игрок 1.
+
+![01_commit_a: Контроль сохранённых данных: дата 2026-11-19, новый игрок 1.](screenshots/01_commit_a_5.png)
+
+</details>
 
 ### 02_commit_b. COMMIT: команда и регион
 
@@ -223,7 +252,28 @@ SELECT count(*) AS new_teams FROM nf.Teams WHERE name = 'HW7_TX_02_NewTeam';
 
 **Вывод:** Изменения обеих таблиц сохранены.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `02_commit_b_1.png` и `02_commit_b_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. Исходное состояние: новых команд 0.
+
+![02_commit_b: Исходное состояние: новых команд 0.](screenshots/02_commit_b_1.png)
+
+2. INSERT команды и UPDATE региона.
+
+![02_commit_b: INSERT команды и UPDATE региона.](screenshots/02_commit_b_2.png)
+
+3. Новая команда видна внутри транзакции.
+
+![02_commit_b: Новая команда видна внутри транзакции.](screenshots/02_commit_b_3.png)
+
+4. Контрольная выборка команды и связанного региона после завершения транзакции.
+
+![02_commit_b: Контрольная выборка команды и связанного региона после завершения транзакции.](screenshots/02_commit_b_4.png)
+
+</details>
 
 ### 03_rollback_a. ROLLBACK: игрок и команда
 
@@ -278,7 +328,24 @@ SELECT count(*) AS new_players FROM nf.Players WHERE nickname = 'HW7_TX_03_NewPl
 
 **Вывод:** Изменения обеих таблиц не сохранены.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `03_rollback_a_1.png` и `03_rollback_a_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 3</summary>
+
+1. До изменений: новых игроков 0.
+
+![03_rollback_a: До изменений: новых игроков 0.](screenshots/03_rollback_a_1.png)
+
+2. Внутри транзакции: новый игрок 1.
+
+![03_rollback_a: Внутри транзакции: новый игрок 1.](screenshots/03_rollback_a_2.png)
+
+3. После отмены: новых игроков 0.
+
+![03_rollback_a: После отмены: новых игроков 0.](screenshots/03_rollback_a_3.png)
+
+</details>
 
 ### 04_rollback_b. ROLLBACK: команда и регион
 
@@ -333,7 +400,28 @@ SELECT count(*) AS new_teams FROM nf.Teams WHERE name = 'HW7_TX_04_NewTeam';
 
 **Вывод:** Изменения обеих таблиц не сохранены.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `04_rollback_b_1.png` и `04_rollback_b_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. До изменений: новых команд 0.
+
+![04_rollback_b: До изменений: новых команд 0.](screenshots/04_rollback_b_1.png)
+
+2. Внутри транзакции: новая команда 1.
+
+![04_rollback_b: Внутри транзакции: новая команда 1.](screenshots/04_rollback_b_2.png)
+
+3. Проверка после отката: новых команд 0.
+
+![04_rollback_b: Проверка после отката: новых команд 0.](screenshots/04_rollback_b_3.png)
+
+4. Итоговая проверка: новых команд 0.
+
+![04_rollback_b: Итоговая проверка: новых команд 0.](screenshots/04_rollback_b_4.png)
+
+</details>
 
 ### 05_error_a. ERROR: игрок и команда
 
@@ -402,7 +490,32 @@ SELECT count(*) AS new_players FROM nf.Players WHERE nickname = 'HW7_TX_05_NewPl
 
 **Вывод:** Изменения обеих таблиц не сохранены.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `05_error_a_1.png` и `05_error_a_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 5</summary>
+
+1. Исходное состояние: новых игроков 0.
+
+![05_error_a: Исходное состояние: новых игроков 0.](screenshots/05_error_a_1.png)
+
+2. Новый игрок виден внутри транзакции.
+
+![05_error_a: Новый игрок виден внутри транзакции.](screenshots/05_error_a_2.png)
+
+3. Деление на ноль: SQLSTATE 22012.
+
+![05_error_a: Деление на ноль: SQLSTATE 22012.](screenshots/05_error_a_3.png)
+
+4. Следующий запрос отклонён: SQLSTATE 25P02.
+
+![05_error_a: Следующий запрос отклонён: SQLSTATE 25P02.](screenshots/05_error_a_4.png)
+
+5. После отмены: новых игроков 0.
+
+![05_error_a: После отмены: новых игроков 0.](screenshots/05_error_a_5.png)
+
+</details>
 
 ### 06_error_b. ERROR: команда и регион
 
@@ -471,7 +584,36 @@ SELECT count(*) AS new_teams FROM nf.Teams WHERE name = 'HW7_TX_06_NewTeam';
 
 **Вывод:** Изменения обеих таблиц не сохранены.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `06_error_b_1.png` и `06_error_b_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 6</summary>
+
+1. Исходное состояние: новых команд 0.
+
+![06_error_b: Исходное состояние: новых команд 0.](screenshots/06_error_b_1.png)
+
+2. Новая команда видна внутри транзакции.
+
+![06_error_b: Новая команда видна внутри транзакции.](screenshots/06_error_b_2.png)
+
+3. Деление на ноль: SQLSTATE 22012.
+
+![06_error_b: Деление на ноль: SQLSTATE 22012.](screenshots/06_error_b_3.png)
+
+4. Прерванная транзакция: SQLSTATE 25P02.
+
+![06_error_b: Прерванная транзакция: SQLSTATE 25P02.](screenshots/06_error_b_4.png)
+
+5. Выполнен ROLLBACK.
+
+![06_error_b: Выполнен ROLLBACK.](screenshots/06_error_b_5.png)
+
+6. После отката: новых команд 0.
+
+![06_error_b: После отката: новых команд 0.](screenshots/06_error_b_6.png)
+
+</details>
 
 ## 2. Уровни изоляции — 16 сценариев
 
@@ -541,7 +683,28 @@ COMMIT;
 
 **Вывод:** Незафиксированное значение не видно. После ROLLBACK остаётся исходное значение.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `07_ru_dirty_a_1.png` и `07_ru_dirty_a_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. T1 меняет цену на 900 без COMMIT.
+
+![07_ru_dirty_a: T1 меняет цену на 900 без COMMIT.](screenshots/07_ru_dirty_a_1.png)
+
+2. T2 устанавливает READ UNCOMMITTED.
+
+![07_ru_dirty_a: T2 устанавливает READ UNCOMMITTED.](screenshots/07_ru_dirty_a_2.png)
+
+3. T2 видит подтверждённую цену 100.
+
+![07_ru_dirty_a: T2 видит подтверждённую цену 100.](screenshots/07_ru_dirty_a_3.png)
+
+4. Повторное чтение даёт 100.
+
+![07_ru_dirty_a: Повторное чтение даёт 100.](screenshots/07_ru_dirty_a_4.png)
+
+</details>
 
 ### 08_ru_dirty_b. READ UNCOMMITTED: грязное чтение, MMR игрока
 
@@ -601,7 +764,32 @@ COMMIT;
 
 **Вывод:** Незафиксированное значение не видно. После COMMIT другой транзакции следующий SELECT видит новое значение.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `08_ru_dirty_b_1.png` и `08_ru_dirty_b_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 5</summary>
+
+1. T1 меняет MMR на 9000 без COMMIT.
+
+![08_ru_dirty_b: T1 меняет MMR на 9000 без COMMIT.](screenshots/08_ru_dirty_b_1.png)
+
+2. T2 устанавливает READ UNCOMMITTED.
+
+![08_ru_dirty_b: T2 устанавливает READ UNCOMMITTED.](screenshots/08_ru_dirty_b_2.png)
+
+3. T2 видит подтверждённый MMR 8000.
+
+![08_ru_dirty_b: T2 видит подтверждённый MMR 8000.](screenshots/08_ru_dirty_b_3.png)
+
+4. T1 выполняет COMMIT.
+
+![08_ru_dirty_b: T1 выполняет COMMIT.](screenshots/08_ru_dirty_b_4.png)
+
+5. После фиксации T2 видит 9000.
+
+![08_ru_dirty_b: После фиксации T2 видит 9000.](screenshots/08_ru_dirty_b_5.png)
+
+</details>
 
 ### 09_rc_dirty_a. READ COMMITTED: грязное чтение, цена предмета
 
@@ -661,7 +849,32 @@ COMMIT;
 
 **Вывод:** Незафиксированное значение не видно. После ROLLBACK остаётся исходное значение.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `09_rc_dirty_a_1.png` и `09_rc_dirty_a_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 5</summary>
+
+1. T1 меняет цену на 900 без COMMIT.
+
+![09_rc_dirty_a: T1 меняет цену на 900 без COMMIT.](screenshots/09_rc_dirty_a_1.png)
+
+2. T2 устанавливает READ COMMITTED.
+
+![09_rc_dirty_a: T2 устанавливает READ COMMITTED.](screenshots/09_rc_dirty_a_2.png)
+
+3. T2 видит цену 100.
+
+![09_rc_dirty_a: T2 видит цену 100.](screenshots/09_rc_dirty_a_3.png)
+
+4. T1 выполняет ROLLBACK.
+
+![09_rc_dirty_a: T1 выполняет ROLLBACK.](screenshots/09_rc_dirty_a_4.png)
+
+5. Цена остаётся 100.
+
+![09_rc_dirty_a: Цена остаётся 100.](screenshots/09_rc_dirty_a_5.png)
+
+</details>
 
 ### 10_rc_dirty_b. READ COMMITTED: грязное чтение, MMR игрока
 
@@ -721,7 +934,28 @@ COMMIT;
 
 **Вывод:** Незафиксированное значение не видно. После COMMIT другой транзакции следующий SELECT видит новое значение.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `10_rc_dirty_b_1.png` и `10_rc_dirty_b_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. T1 меняет MMR на 9000 без COMMIT.
+
+![10_rc_dirty_b: T1 меняет MMR на 9000 без COMMIT.](screenshots/10_rc_dirty_b_1.png)
+
+2. T2 устанавливает READ COMMITTED.
+
+![10_rc_dirty_b: T2 устанавливает READ COMMITTED.](screenshots/10_rc_dirty_b_2.png)
+
+3. До фиксации T2 видит 8000.
+
+![10_rc_dirty_b: До фиксации T2 видит 8000.](screenshots/10_rc_dirty_b_3.png)
+
+4. После фиксации T2 видит 9000.
+
+![10_rc_dirty_b: После фиксации T2 видит 9000.](screenshots/10_rc_dirty_b_4.png)
+
+</details>
 
 ### 11_rc_repeat_a. READ COMMITTED: повторное чтение, цена предмета
 
@@ -769,7 +1003,28 @@ SELECT cost FROM nf.Items WHERE name = 'HW7_TX_11_Item';
 
 **Вывод:** В одной транзакции два SELECT видят разные значения.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `11_rc_repeat_a_1.png` и `11_rc_repeat_a_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. T1: первое чтение цены 100.
+
+![11_rc_repeat_a: T1: первое чтение цены 100.](screenshots/11_rc_repeat_a_1.png)
+
+2. T2: UPDATE до 150 и COMMIT.
+
+![11_rc_repeat_a: T2: UPDATE до 150 и COMMIT.](screenshots/11_rc_repeat_a_2.png)
+
+3. T1: повторное чтение цены 150.
+
+![11_rc_repeat_a: T1: повторное чтение цены 150.](screenshots/11_rc_repeat_a_3.png)
+
+4. После COMMIT T1 цена 150.
+
+![11_rc_repeat_a: После COMMIT T1 цена 150.](screenshots/11_rc_repeat_a_4.png)
+
+</details>
 
 ### 12_rc_repeat_b. READ COMMITTED: повторное чтение, MMR игрока
 
@@ -817,7 +1072,28 @@ SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_12_Player';
 
 **Вывод:** В одной транзакции два SELECT видят разные значения.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `12_rc_repeat_b_1.png` и `12_rc_repeat_b_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. T1: первое чтение MMR 8000.
+
+![12_rc_repeat_b: T1: первое чтение MMR 8000.](screenshots/12_rc_repeat_b_1.png)
+
+2. T2: UPDATE до 8100 и COMMIT.
+
+![12_rc_repeat_b: T2: UPDATE до 8100 и COMMIT.](screenshots/12_rc_repeat_b_2.png)
+
+3. T1: повторное чтение MMR 8100.
+
+![12_rc_repeat_b: T1: повторное чтение MMR 8100.](screenshots/12_rc_repeat_b_3.png)
+
+4. После COMMIT T1 MMR 8100.
+
+![12_rc_repeat_b: После COMMIT T1 MMR 8100.](screenshots/12_rc_repeat_b_4.png)
+
+</details>
 
 ### 13_rc_phantom_a. READ COMMITTED: новый игрок команды
 
@@ -869,7 +1145,28 @@ WHERE team_id = (SELECT team_id FROM nf.Teams WHERE name = 'HW7_TX_13_Team');
 
 **Вывод:** Количество строк изменяется с 1 до 2: фантомное чтение.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `13_rc_phantom_a_1.png` и `13_rc_phantom_a_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. T1: в команде один игрок.
+
+![13_rc_phantom_a: T1: в команде один игрок.](screenshots/13_rc_phantom_a_1.png)
+
+2. T2: INSERT нового игрока и COMMIT.
+
+![13_rc_phantom_a: T2: INSERT нового игрока и COMMIT.](screenshots/13_rc_phantom_a_2.png)
+
+3. T1 видит двух игроков: фантом появился.
+
+![13_rc_phantom_a: T1 видит двух игроков: фантом появился.](screenshots/13_rc_phantom_a_3.png)
+
+4. После COMMIT T1 игроков также два.
+
+![13_rc_phantom_a: После COMMIT T1 игроков также два.](screenshots/13_rc_phantom_a_4.png)
+
+</details>
 
 ### 14_rc_phantom_b. READ COMMITTED: новый предмет в выборке
 
@@ -918,7 +1215,28 @@ SELECT count(*) AS items_count FROM nf.Items WHERE description = 'HW7_TX_14_Grou
 
 **Вывод:** Количество строк изменяется с 1 до 2: фантомное чтение.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `14_rc_phantom_b_1.png` и `14_rc_phantom_b_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. T1: условию соответствует один предмет.
+
+![14_rc_phantom_b: T1: условию соответствует один предмет.](screenshots/14_rc_phantom_b_1.png)
+
+2. T2: INSERT второго предмета и COMMIT.
+
+![14_rc_phantom_b: T2: INSERT второго предмета и COMMIT.](screenshots/14_rc_phantom_b_2.png)
+
+3. T1 видит два предмета: фантом появился.
+
+![14_rc_phantom_b: T1 видит два предмета: фантом появился.](screenshots/14_rc_phantom_b_3.png)
+
+4. Итоговая проверка: два предмета.
+
+![14_rc_phantom_b: Итоговая проверка: два предмета.](screenshots/14_rc_phantom_b_4.png)
+
+</details>
 
 ### 15_rr_repeat_a. REPEATABLE READ: повторное чтение, цена предмета
 
@@ -966,7 +1284,28 @@ SELECT cost FROM nf.Items WHERE name = 'HW7_TX_15_Item';
 
 **Вывод:** В T1 остаётся старый снимок. Новое значение видно только после завершения T1.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `15_rr_repeat_a_1.png` и `15_rr_repeat_a_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. T1: первое чтение цены 100.
+
+![15_rr_repeat_a: T1: первое чтение цены 100.](screenshots/15_rr_repeat_a_1.png)
+
+2. T2: изменение цены до 150 и COMMIT.
+
+![15_rr_repeat_a: T2: изменение цены до 150 и COMMIT.](screenshots/15_rr_repeat_a_2.png)
+
+3. T1 продолжает видеть 100 на прежнем снимке.
+
+![15_rr_repeat_a: T1 продолжает видеть 100 на прежнем снимке.](screenshots/15_rr_repeat_a_3.png)
+
+4. После COMMIT T1 видна цена 150.
+
+![15_rr_repeat_a: После COMMIT T1 видна цена 150.](screenshots/15_rr_repeat_a_4.png)
+
+</details>
 
 ### 16_rr_repeat_b. REPEATABLE READ: повторное чтение, MMR игрока
 
@@ -1014,7 +1353,28 @@ SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_16_Player';
 
 **Вывод:** В T1 остаётся старый снимок. Новое значение видно только после завершения T1.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `16_rr_repeat_b_1.png` и `16_rr_repeat_b_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. T1: первое чтение MMR 8000.
+
+![16_rr_repeat_b: T1: первое чтение MMR 8000.](screenshots/16_rr_repeat_b_1.png)
+
+2. T2: изменение MMR до 8100 и COMMIT.
+
+![16_rr_repeat_b: T2: изменение MMR до 8100 и COMMIT.](screenshots/16_rr_repeat_b_2.png)
+
+3. T1 продолжает видеть 8000.
+
+![16_rr_repeat_b: T1 продолжает видеть 8000.](screenshots/16_rr_repeat_b_3.png)
+
+4. После COMMIT T1 виден MMR 8100.
+
+![16_rr_repeat_b: После COMMIT T1 виден MMR 8100.](screenshots/16_rr_repeat_b_4.png)
+
+</details>
 
 ### 17_rr_phantom_a. REPEATABLE READ: новый игрок команды
 
@@ -1066,7 +1426,28 @@ WHERE team_id = (SELECT team_id FROM nf.Teams WHERE name = 'HW7_TX_17_Team');
 
 **Вывод:** В T1 количество остаётся 1, после COMMIT становится 2. Фантомного чтения в PostgreSQL REPEATABLE READ нет.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `17_rr_phantom_a_1.png` и `17_rr_phantom_a_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. T1: в команде один игрок.
+
+![17_rr_phantom_a: T1: в команде один игрок.](screenshots/17_rr_phantom_a_1.png)
+
+2. T2: INSERT игрока и COMMIT.
+
+![17_rr_phantom_a: T2: INSERT игрока и COMMIT.](screenshots/17_rr_phantom_a_2.png)
+
+3. T1 по-прежнему видит одного игрока.
+
+![17_rr_phantom_a: T1 по-прежнему видит одного игрока.](screenshots/17_rr_phantom_a_3.png)
+
+4. После COMMIT T1 видит двух игроков.
+
+![17_rr_phantom_a: После COMMIT T1 видит двух игроков.](screenshots/17_rr_phantom_a_4.png)
+
+</details>
 
 ### 18_rr_phantom_b. REPEATABLE READ: новый предмет в выборке
 
@@ -1115,7 +1496,28 @@ SELECT count(*) AS items_count FROM nf.Items WHERE description = 'HW7_TX_18_Grou
 
 **Вывод:** В T1 количество остаётся 1, после COMMIT становится 2. Фантомного чтения в PostgreSQL REPEATABLE READ нет.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `18_rr_phantom_b_1.png` и `18_rr_phantom_b_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. T1: в выборке один предмет.
+
+![18_rr_phantom_b: T1: в выборке один предмет.](screenshots/18_rr_phantom_b_1.png)
+
+2. T2: INSERT предмета и COMMIT.
+
+![18_rr_phantom_b: T2: INSERT предмета и COMMIT.](screenshots/18_rr_phantom_b_2.png)
+
+3. T1 на прежнем снимке видит один предмет.
+
+![18_rr_phantom_b: T1 на прежнем снимке видит один предмет.](screenshots/18_rr_phantom_b_3.png)
+
+4. После завершения T1 видит два предмета.
+
+![18_rr_phantom_b: После завершения T1 видит два предмета.](screenshots/18_rr_phantom_b_4.png)
+
+</details>
 
 ### 19_serial_insert_a. SERIALIZABLE: две одинаковые заявки на матч (1800 секунд)
 
@@ -1202,7 +1604,40 @@ SELECT count(*) AS matches_count FROM nf.Matches WHERE game_mode_id = (SELECT ga
 
 **Вывод:** Обе транзакции прочитали отсутствие матча. После вставки и COMMIT T1 вставка T2 завершается SQLSTATE 40001. После повтора T2 видит матч и не вставляет дубликат. Итог — один матч.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `19_serial_insert_a_1.png` и `19_serial_insert_a_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 7</summary>
+
+1. T1: подходящих матчей 0.
+
+![19_serial_insert_a: T1: подходящих матчей 0.](screenshots/19_serial_insert_a_1.png)
+
+2. T2: подходящих матчей 0.
+
+![19_serial_insert_a: T2: подходящих матчей 0.](screenshots/19_serial_insert_a_2.png)
+
+3. T1 вставляет матч и выполняет COMMIT.
+
+![19_serial_insert_a: T1 вставляет матч и выполняет COMMIT.](screenshots/19_serial_insert_a_3.png)
+
+4. T2 получает ошибку сериализации 40001 при вставке.
+
+![19_serial_insert_a: T2 получает ошибку сериализации 40001 при вставке.](screenshots/19_serial_insert_a_4.png)
+
+5. T2 выполняет ROLLBACK.
+
+![19_serial_insert_a: T2 выполняет ROLLBACK.](screenshots/19_serial_insert_a_5.png)
+
+6. Повтор T2: матч уже существует, количество 1.
+
+![19_serial_insert_a: Повтор T2: матч уже существует, количество 1.](screenshots/19_serial_insert_a_6.png)
+
+7. Итоговая проверка: один матч.
+
+![19_serial_insert_a: Итоговая проверка: один матч.](screenshots/19_serial_insert_a_7.png)
+
+</details>
 
 ### 20_serial_insert_b. SERIALIZABLE: две одинаковые заявки на матч (2400 секунд)
 
@@ -1289,7 +1724,44 @@ SELECT count(*) AS matches_count FROM nf.Matches WHERE game_mode_id = (SELECT ga
 
 **Вывод:** Обе транзакции прочитали отсутствие матча. После вставки и COMMIT T1 вставка T2 завершается SQLSTATE 40001. После повтора T2 видит матч и не вставляет дубликат. Итог — один матч.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `20_serial_insert_b_1.png` и `20_serial_insert_b_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 8</summary>
+
+1. T1: подходящих матчей 0.
+
+![20_serial_insert_b: T1: подходящих матчей 0.](screenshots/20_serial_insert_b_1.png)
+
+2. T2: подходящих матчей 0.
+
+![20_serial_insert_b: T2: подходящих матчей 0.](screenshots/20_serial_insert_b_2.png)
+
+3. T1 вставляет матч и выполняет COMMIT.
+
+![20_serial_insert_b: T1 вставляет матч и выполняет COMMIT.](screenshots/20_serial_insert_b_3.png)
+
+4. T2 получает SQLSTATE 40001.
+
+![20_serial_insert_b: T2 получает SQLSTATE 40001.](screenshots/20_serial_insert_b_4.png)
+
+5. T2 выполняет ROLLBACK.
+
+![20_serial_insert_b: T2 выполняет ROLLBACK.](screenshots/20_serial_insert_b_5.png)
+
+6. Повтор T2: найден один матч.
+
+![20_serial_insert_b: Повтор T2: найден один матч.](screenshots/20_serial_insert_b_6.png)
+
+7. Повторный INSERT с NOT EXISTS и COMMIT.
+
+![20_serial_insert_b: Повторный INSERT с NOT EXISTS и COMMIT.](screenshots/20_serial_insert_b_7.png)
+
+8. Итог: остался один матч.
+
+![20_serial_insert_b: Итог: остался один матч.](screenshots/20_serial_insert_b_8.png)
+
+</details>
 
 ### 21_serial_update_a. SERIALIZABLE: конкурентное обновление цены
 
@@ -1366,7 +1838,44 @@ SELECT cost FROM nf.Items WHERE name = 'HW7_TX_21_Item';
 
 **Вывод:** T2 получает could not serialize access due to concurrent update (40001). После полного повтора учитываются обе прибавки: 100 → 110 → 130.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `21_serial_update_a_1.png` и `21_serial_update_a_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 8</summary>
+
+1. T1: первоначальная цена 100.
+
+![21_serial_update_a: T1: первоначальная цена 100.](screenshots/21_serial_update_a_1.png)
+
+2. T2: первоначальная цена 100.
+
+![21_serial_update_a: T2: первоначальная цена 100.](screenshots/21_serial_update_a_2.png)
+
+3. T1 увеличивает цену на 10 и выполняет COMMIT.
+
+![21_serial_update_a: T1 увеличивает цену на 10 и выполняет COMMIT.](screenshots/21_serial_update_a_3.png)
+
+4. T2: ошибка конкурентного UPDATE, SQLSTATE 40001.
+
+![21_serial_update_a: T2: ошибка конкурентного UPDATE, SQLSTATE 40001.](screenshots/21_serial_update_a_4.png)
+
+5. T2 выполняет ROLLBACK.
+
+![21_serial_update_a: T2 выполняет ROLLBACK.](screenshots/21_serial_update_a_5.png)
+
+6. Повтор T2: чтение новой цены 110.
+
+![21_serial_update_a: Повтор T2: чтение новой цены 110.](screenshots/21_serial_update_a_6.png)
+
+7. T2 увеличивает цену на 20 и выполняет COMMIT.
+
+![21_serial_update_a: T2 увеличивает цену на 20 и выполняет COMMIT.](screenshots/21_serial_update_a_7.png)
+
+8. Итоговая цена 130.
+
+![21_serial_update_a: Итоговая цена 130.](screenshots/21_serial_update_a_8.png)
+
+</details>
 
 ### 22_serial_update_b. SERIALIZABLE: конкурентное обновление MMR
 
@@ -1443,7 +1952,44 @@ SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_22_Player';
 
 **Вывод:** T2 получает could not serialize access due to concurrent update (40001). После полного повтора учитываются обе прибавки: 8000 → 8100 → 8300.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `22_serial_update_b_1.png` и `22_serial_update_b_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 8</summary>
+
+1. T1: первоначальный MMR 8000.
+
+![22_serial_update_b: T1: первоначальный MMR 8000.](screenshots/22_serial_update_b_1.png)
+
+2. T2: первоначальный MMR 8000.
+
+![22_serial_update_b: T2: первоначальный MMR 8000.](screenshots/22_serial_update_b_2.png)
+
+3. T1 добавляет 100 и выполняет COMMIT.
+
+![22_serial_update_b: T1 добавляет 100 и выполняет COMMIT.](screenshots/22_serial_update_b_3.png)
+
+4. T2: SQLSTATE 40001 при конкурентном UPDATE.
+
+![22_serial_update_b: T2: SQLSTATE 40001 при конкурентном UPDATE.](screenshots/22_serial_update_b_4.png)
+
+5. T2 выполняет ROLLBACK.
+
+![22_serial_update_b: T2 выполняет ROLLBACK.](screenshots/22_serial_update_b_5.png)
+
+6. Повтор T2: MMR 8100.
+
+![22_serial_update_b: Повтор T2: MMR 8100.](screenshots/22_serial_update_b_6.png)
+
+7. T2 добавляет 200 и выполняет COMMIT.
+
+![22_serial_update_b: T2 добавляет 200 и выполняет COMMIT.](screenshots/22_serial_update_b_7.png)
+
+8. Итоговый MMR 8300.
+
+![22_serial_update_b: Итоговый MMR 8300.](screenshots/22_serial_update_b_8.png)
+
+</details>
 
 ## 3. SAVEPOINT — 2 сценария
 
@@ -1505,7 +2051,32 @@ SELECT nickname FROM nf.Players WHERE nickname IN ('HW7_TX_23_Before', 'HW7_TX_2
 
 **Вывод:** После ROLLBACK TO остались дата 2010-01-01 и игрок Before, созданные до SAVEPOINT. Игрок After и дата 2020-01-01 отменены. COMMIT сохраняет оставшуюся часть.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `23_savepoint_one_1.png` и `23_savepoint_one_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 5</summary>
+
+1. Изменения и игрок Before созданы до SAVEPOINT.
+
+![23_savepoint_one: Изменения и игрок Before созданы до SAVEPOINT.](screenshots/23_savepoint_one_1.png)
+
+2. Игрок After и второе изменение даты созданы после SAVEPOINT.
+
+![23_savepoint_one: Игрок After и второе изменение даты созданы после SAVEPOINT.](screenshots/23_savepoint_one_2.png)
+
+3. Перед откатом видны Before и After.
+
+![23_savepoint_one: Перед откатом видны Before и After.](screenshots/23_savepoint_one_3.png)
+
+4. После ROLLBACK TO остался только Before.
+
+![23_savepoint_one: После ROLLBACK TO остался только Before.](screenshots/23_savepoint_one_4.png)
+
+5. После завершения транзакции Before сохранился.
+
+![23_savepoint_one: После завершения транзакции Before сохранился.](screenshots/23_savepoint_one_5.png)
+
+</details>
 
 ### 24_savepoint_two. SAVEPOINT: возврат ко второй и первой точкам
 
@@ -1557,7 +2128,28 @@ SELECT cost FROM nf.Items WHERE name = 'HW7_TX_24_Item';
 
 **Вывод:** Цена меняется 100 → 110 → 120 → 130. Откат ко второй точке возвращает 120, к первой — 110. Откат к первой уничтожает более позднюю вторую точку. После COMMIT цена 110.
 
-**Фотографии pgAdmin:** после ручной проверки добавить `24_savepoint_two_1.png` и `24_savepoint_two_2.png` в `screenshots/` и вставить их в этот раздел. Сейчас фотографии не приложены.
+**Фотографии выполнения в pgAdmin (PostgreSQL 18):**
+
+<details>
+<summary>Показать снимки — 4</summary>
+
+1. Созданы две точки, текущая цена 130.
+
+![24_savepoint_two: Созданы две точки, текущая цена 130.](screenshots/24_savepoint_two_1.png)
+
+2. ROLLBACK TO second_point возвращает 120.
+
+![24_savepoint_two: ROLLBACK TO second_point возвращает 120.](screenshots/24_savepoint_two_2.png)
+
+3. ROLLBACK TO first_point возвращает 110.
+
+![24_savepoint_two: ROLLBACK TO first_point возвращает 110.](screenshots/24_savepoint_two_3.png)
+
+4. После RELEASE и COMMIT цена 110.
+
+![24_savepoint_two: После RELEASE и COMMIT цена 110.](screenshots/24_savepoint_two_4.png)
+
+</details>
 
 ## 4. Общие выводы
 
@@ -1585,8 +2177,9 @@ SELECT cost FROM nf.Items WHERE name = 'HW7_TX_24_Item';
 - [x] Подготовлены SQL-блоки с комментариями.
 - [x] Все 24 сценария выполнены на локальной PostgreSQL.
 - [x] Фактические результаты и выводы включены в отчёт.
-- [ ] Выполнить сценарии в своей базе через pgAdmin.
-- [ ] Добавить собственные фотографии выполнения в `screenshots/` и отчёт.
+- [x] Выполнить сценарии в своей базе через pgAdmin; фотографии приложены.
+- [x] Добавить собственные фотографии выполнения в `screenshots/` и отчёт.
 - [ ] После проверки подготовить изменения репозитория и отправку.
 
-На этапе подготовки работа только сохранена локально: коммитов, push и PR нет.
+Комплект подготовлен для проверки во временной ветке. Финальный PR для сдачи
+не создан; старые домашние работы и основная ветка не изменены.

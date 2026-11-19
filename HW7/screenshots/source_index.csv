@@ -1,0 +1,118 @@
+scenario,file,original,caption,sha256
+01_commit_a,01_commit_a_1.png,Снимок экрана 2026-11-19 181330.png,Исходная проверка: новых игроков 0.,654ab639ff0dcd4d19d8de41ed523942021e38fd9c8dec5fe582779dabf70d62
+01_commit_a,01_commit_a_2.png,Снимок экрана 2026-11-19 181345.png,Повторная проверка исходного состояния.,c2d2eca95fd053b090cabcd4ad9f29612e5b92d5fb71145059aa0c64dc26573e
+01_commit_a,01_commit_a_3.png,Снимок экрана 2026-11-19 181503.png,INSERT игрока и UPDATE даты команды.,3c0addb1f1b4ffbcad554d88dfcafbd48ab75746e3d4436505d650db34f74d58
+01_commit_a,01_commit_a_4.png,Снимок экрана 2026-11-19 181555.png,Внутри транзакции новый игрок уже виден.,ab59109a2665762966eb927586967a5dcfc6eb1cf99663fa2621baf547cbe0b0
+01_commit_a,01_commit_a_5.png,Снимок экрана 2026-11-19 184435.png,"Контроль сохранённых данных: дата 2026-11-19, новый игрок 1.",f4e7b0582f056c4c58856b9d11e89dcc90a9215081f3102f28038a5c4e0ef502
+02_commit_b,02_commit_b_1.png,Снимок экрана 2026-11-19 181700.png,Исходное состояние: новых команд 0.,08529e3e69c68208704fdc9767a88dd8234e4af15d1b3f6851b8bfd6ffb666e4
+02_commit_b,02_commit_b_2.png,Снимок экрана 2026-11-19 181714.png,INSERT команды и UPDATE региона.,2a05875f2b688b06571011daf9003f8e5da0e3b696d2b185196080c5561273fc
+02_commit_b,02_commit_b_3.png,Снимок экрана 2026-11-19 181724.png,Новая команда видна внутри транзакции.,7c0582dc1dd097ab071cb10680d921d632950f412c7fdb0a55616f7d803baa12
+02_commit_b,02_commit_b_4.png,Снимок экрана 2026-11-19 184443.png,Контрольная выборка команды и связанного региона после завершения транзакции.,0cec8b47b2f4a8f8b45595d7b6e4e8d27e57b79af46a7fd7cd4b97461785f41f
+03_rollback_a,03_rollback_a_1.png,Снимок экрана 2026-11-19 181805.png,До изменений: новых игроков 0.,e3303d84b547479b53cc4c58683d1245a6b5699dfaeb815aeae6f16af4a32b8c
+03_rollback_a,03_rollback_a_2.png,Снимок экрана 2026-11-19 181817.png,Внутри транзакции: новый игрок 1.,e9056ef5f8bc5c9ae3ddb2103a250095261c1b021a5a7a9e97170385c7d0e3c8
+03_rollback_a,03_rollback_a_3.png,Снимок экрана 2026-11-19 181830.png,После отмены: новых игроков 0.,97398a377aa46b48173699fcda0caeb34d10987c73e1a8147293a53b222e9e5c
+04_rollback_b,04_rollback_b_1.png,Снимок экрана 2026-11-19 181905.png,До изменений: новых команд 0.,371db6091d42e4f0325bbffcf87ea3bef30cb9f099dd55732c6d736f7fbf5425
+04_rollback_b,04_rollback_b_2.png,Снимок экрана 2026-11-19 181922.png,Внутри транзакции: новая команда 1.,78ddd482bd9e7694776d69ae90ae834e9665583212b13783ef158261cecbe8c0
+04_rollback_b,04_rollback_b_3.png,Снимок экрана 2026-11-19 181934.png,Проверка после отката: новых команд 0.,bbda1b8217e44112fc8c9c7692f814ae702cf25247ce9d4e87d98c407e5741a7
+04_rollback_b,04_rollback_b_4.png,Снимок экрана 2026-11-19 181954.png,Итоговая проверка: новых команд 0.,1fac06e70d025ee4081f35a92e6f696751238d446417513778c63f8cd706c071
+05_error_a,05_error_a_1.png,Снимок экрана 2026-11-19 182005.png,Исходное состояние: новых игроков 0.,baeb0be9b5eb0a0500226ad8e189273457be8314a517aa7acb5f5f2c8917c717
+05_error_a,05_error_a_2.png,Снимок экрана 2026-11-19 182024.png,Новый игрок виден внутри транзакции.,f9e25082fd353dffb1d49ca3b343e985a96b70d04381f67870ab7cf2c17b1c02
+05_error_a,05_error_a_3.png,Снимок экрана 2026-11-19 182041.png,Деление на ноль: SQLSTATE 22012.,6f775d56ce7b74511cfa17f867620dece8a8868557ffaadd9fda763d61d710dd
+05_error_a,05_error_a_4.png,Снимок экрана 2026-11-19 182050.png,Следующий запрос отклонён: SQLSTATE 25P02.,e64445fda34b0bef9fe8447586cd16381543da5c684c8e2e2a550ee171d7cd76
+05_error_a,05_error_a_5.png,Снимок экрана 2026-11-19 182101.png,После отмены: новых игроков 0.,47083dcb2336b2b70e4a9910374dcd48f79638ce9fa95561fd50c18f40220168
+06_error_b,06_error_b_1.png,Снимок экрана 2026-11-19 182111.png,Исходное состояние: новых команд 0.,2c7d443ee8861a06a5ad5d2c4dc33caaa494be16b3825f713fc02a1b9735e3c5
+06_error_b,06_error_b_2.png,Снимок экрана 2026-11-19 182125.png,Новая команда видна внутри транзакции.,f338926f7021a880e032f707cf99065d4fcfa3e90cacc12daff2d3c8459e98e6
+06_error_b,06_error_b_3.png,Снимок экрана 2026-11-19 182136.png,Деление на ноль: SQLSTATE 22012.,63ca99ea057613c2442e6e94cb91346ee493b8ceb45392b385c11b9b87d81c5e
+06_error_b,06_error_b_4.png,Снимок экрана 2026-11-19 182142.png,Прерванная транзакция: SQLSTATE 25P02.,bbf7438434df3b17744264454c968fe09901051a53f4f31119af8ba00c5406a9
+06_error_b,06_error_b_5.png,Снимок экрана 2026-11-19 182147.png,Выполнен ROLLBACK.,62a9d23b2d324abb59eaf4ce16799d8e520867397abc11ae58e167f2a66ce3ed
+06_error_b,06_error_b_6.png,Снимок экрана 2026-11-19 182154.png,После отката: новых команд 0.,5342a8910e3f92893bd1565df63f7a5ccaa293119081ae8c4201d85ff5b076bc
+07_ru_dirty_a,07_ru_dirty_a_1.png,Снимок экрана 2026-11-19 182220.png,T1 меняет цену на 900 без COMMIT.,d44474ab9f82cf087ee845a8baff0d78dff7c382c11fae8c0d8c1999df271716
+07_ru_dirty_a,07_ru_dirty_a_2.png,Снимок экрана 2026-11-19 182228.png,T2 устанавливает READ UNCOMMITTED.,da1ca563058ecd6cd0b367622e9b53272627163dcd29c98a72944fd32c475cb3
+07_ru_dirty_a,07_ru_dirty_a_3.png,Снимок экрана 2026-11-19 182242.png,T2 видит подтверждённую цену 100.,50fffc2a0ce557544c8c5452d1282df371c042f9ff3ad59b9581cc6097372d11
+07_ru_dirty_a,07_ru_dirty_a_4.png,Снимок экрана 2026-11-19 182306.png,Повторное чтение даёт 100.,2c06426033fc43b68811fd98d036be0eae265ef70edf45c685122028c5acbc3b
+08_ru_dirty_b,08_ru_dirty_b_1.png,Снимок экрана 2026-11-19 182324.png,T1 меняет MMR на 9000 без COMMIT.,e4c41ae6e3a5e5286ce35d84a4465b62c0f06249e9671ce42c9b1d994d8bb3f5
+08_ru_dirty_b,08_ru_dirty_b_2.png,Снимок экрана 2026-11-19 182333.png,T2 устанавливает READ UNCOMMITTED.,30942910e52b4dc628e9b52bd123488969d055bb2694b0a1e87cc49a8f9b07cc
+08_ru_dirty_b,08_ru_dirty_b_3.png,Снимок экрана 2026-11-19 182340.png,T2 видит подтверждённый MMR 8000.,a6233d7cbbbd27769e5ae86e0d5a00032842b192f19444e267f8902ffb5cc99d
+08_ru_dirty_b,08_ru_dirty_b_4.png,Снимок экрана 2026-11-19 182347.png,T1 выполняет COMMIT.,73ef6db8b906334dbdfb4307dc30e9732a5e87cd99d82157c188ac1627416535
+08_ru_dirty_b,08_ru_dirty_b_5.png,Снимок экрана 2026-11-19 182356.png,После фиксации T2 видит 9000.,abb6cd781ddcf1bbf79183c1de63c58131ef55923de8947b98926f3a732c6c51
+09_rc_dirty_a,09_rc_dirty_a_1.png,Снимок экрана 2026-11-19 182421.png,T1 меняет цену на 900 без COMMIT.,00910975a5aa416cde596fef199d5ae9bdfe93f37a6e8070605d7e14bf0c00d3
+09_rc_dirty_a,09_rc_dirty_a_2.png,Снимок экрана 2026-11-19 182430.png,T2 устанавливает READ COMMITTED.,6af161e68e2286f2d1a6c9a0341546da4d10307c459f3c605e5a97376cf863d0
+09_rc_dirty_a,09_rc_dirty_a_3.png,Снимок экрана 2026-11-19 182436.png,T2 видит цену 100.,8873d0cffd27513cb634bde2209465edaf652a46242938a05c17096d14b7831b
+09_rc_dirty_a,09_rc_dirty_a_4.png,Снимок экрана 2026-11-19 182442.png,T1 выполняет ROLLBACK.,4a20ab08549f1edd6e46b5638299bb81c366c28c39efa49f2a089da1cff62bae
+09_rc_dirty_a,09_rc_dirty_a_5.png,Снимок экрана 2026-11-19 182451.png,Цена остаётся 100.,544097a972ff6e3a4fb57dfb9679fa6478346454d269c94ef759197a11cae6a3
+10_rc_dirty_b,10_rc_dirty_b_1.png,Снимок экрана 2026-11-19 182513.png,T1 меняет MMR на 9000 без COMMIT.,9dbba93f75c76715a3ce94fb0d3c3a5e60fed1e8e5ed48bf720d90f7f800a502
+10_rc_dirty_b,10_rc_dirty_b_2.png,Снимок экрана 2026-11-19 182520.png,T2 устанавливает READ COMMITTED.,f99bffbcc16f3826a8165a9eca3dfbc16194700bc758d186dbfe7e887e538289
+10_rc_dirty_b,10_rc_dirty_b_3.png,Снимок экрана 2026-11-19 182528.png,До фиксации T2 видит 8000.,1c8b367f1a5cef4e1a6f8915969d3e577312331a90dc7389ffb2cbf509b21ce7
+10_rc_dirty_b,10_rc_dirty_b_4.png,Снимок экрана 2026-11-19 182539.png,После фиксации T2 видит 9000.,11ed9978ba9a9fa47786b46418fa5ecd4dddd78481052feab93e4cb420d39bf2
+11_rc_repeat_a,11_rc_repeat_a_1.png,Снимок экрана 2026-11-19 182600.png,T1: первое чтение цены 100.,da4b713bc111b5677be881e6fee876a9ea44a16a661b6d8b2401212a4681640a
+11_rc_repeat_a,11_rc_repeat_a_2.png,Снимок экрана 2026-11-19 182606.png,T2: UPDATE до 150 и COMMIT.,f6d479c406e63c11af710720c8e5d6f0d4dcc677ea86559fdcfc3446fa45eb10
+11_rc_repeat_a,11_rc_repeat_a_3.png,Снимок экрана 2026-11-19 182614.png,T1: повторное чтение цены 150.,35cce03567e2e400d61d56c5cdeaab59ad8f7bdcb4277a6ee4c12e4763b2c3a2
+11_rc_repeat_a,11_rc_repeat_a_4.png,Снимок экрана 2026-11-19 182621.png,После COMMIT T1 цена 150.,05ac50f964e6ef9ae644a0ef09811408c97d31bd34c3b1b351af89dc4bf37d73
+12_rc_repeat_b,12_rc_repeat_b_1.png,Снимок экрана 2026-11-19 182828.png,T1: первое чтение MMR 8000.,addb85dad2abbb56250e3b65eda2693a14238b1e6bd89ebd9cab1720f75b6624
+12_rc_repeat_b,12_rc_repeat_b_2.png,Снимок экрана 2026-11-19 182835.png,T2: UPDATE до 8100 и COMMIT.,2730a6176c6931383b434095dcd30895f4e124ee53d2b44b4c5d23569bd5b835
+12_rc_repeat_b,12_rc_repeat_b_3.png,Снимок экрана 2026-11-19 182842.png,T1: повторное чтение MMR 8100.,7d2caab703e6951da1bd503873835cd3d3377bc2505a04c6fea831b988afba05
+12_rc_repeat_b,12_rc_repeat_b_4.png,Снимок экрана 2026-11-19 182848.png,После COMMIT T1 MMR 8100.,0dc3c1c25bc72f30ff49bd1005b2a3330c70b9cbc45a5060eac43abe5f14797c
+13_rc_phantom_a,13_rc_phantom_a_1.png,Снимок экрана 2026-11-19 182901.png,T1: в команде один игрок.,80ba86b56a13cd5a2dda4aeb65db7953c79ada0724708f53c18a3c228c0cf402
+13_rc_phantom_a,13_rc_phantom_a_2.png,Снимок экрана 2026-11-19 182909.png,T2: INSERT нового игрока и COMMIT.,e1c605ed3c7009f7745d2c258f2c56d17ff9478493fa5d306f29ea2af994f46d
+13_rc_phantom_a,13_rc_phantom_a_3.png,Снимок экрана 2026-11-19 182920.png,T1 видит двух игроков: фантом появился.,a48a0781fc1a5d82b42b1cb8992cf16a6f360838963ffc54df817f981fae3808
+13_rc_phantom_a,13_rc_phantom_a_4.png,Снимок экрана 2026-11-19 182928.png,После COMMIT T1 игроков также два.,e02921fe0559a26e0f6d4e28a29b14e70ee6b1ce94bb0ee5e5911c76eae47487
+14_rc_phantom_b,14_rc_phantom_b_1.png,Снимок экрана 2026-11-19 183006.png,T1: условию соответствует один предмет.,a1a1ace89f7a17a28a7f003c836d753702d81db257dccb3b8202324596bfcbb8
+14_rc_phantom_b,14_rc_phantom_b_2.png,Снимок экрана 2026-11-19 183015.png,T2: INSERT второго предмета и COMMIT.,d1eedbb030a2605b52025d1c8219999e0a100fa5a538a96562e93e41ca9f67b7
+14_rc_phantom_b,14_rc_phantom_b_3.png,Снимок экрана 2026-11-19 183023.png,T1 видит два предмета: фантом появился.,bdf65e2508e6c01319e44c5528609704a40af0e44a525a858ccfa6ae922a6726
+14_rc_phantom_b,14_rc_phantom_b_4.png,Снимок экрана 2026-11-19 183030.png,Итоговая проверка: два предмета.,2ddb802968cb91ebeee5e7243a6be6196d1ed17b9af95355ba3e4599eb9bed24
+15_rr_repeat_a,15_rr_repeat_a_1.png,Снимок экрана 2026-11-19 183038.png,T1: первое чтение цены 100.,d71692a053782fddea485ba521862efd636babe224a11c319e91e86cf1ae6a07
+15_rr_repeat_a,15_rr_repeat_a_2.png,Снимок экрана 2026-11-19 183046.png,T2: изменение цены до 150 и COMMIT.,eccc827c4fd3a31e227f4651a2acf1024b5d6204c8122f3aea84b21d0dd1e02f
+15_rr_repeat_a,15_rr_repeat_a_3.png,Снимок экрана 2026-11-19 183055.png,T1 продолжает видеть 100 на прежнем снимке.,ea9c4a5ae71bf6b009989163f8eae2fb0d2b3af39aed1271d8ec41c2372f1122
+15_rr_repeat_a,15_rr_repeat_a_4.png,Снимок экрана 2026-11-19 183101.png,После COMMIT T1 видна цена 150.,fc5495a0fd29c396bce30b743b3b20178999092997d40e1fd86ffde8450da8fa
+16_rr_repeat_b,16_rr_repeat_b_1.png,Снимок экрана 2026-11-19 183114.png,T1: первое чтение MMR 8000.,4e7f7ab3f8c7fb39ea2678736bbfda730d15a57af84db692640d85ffcb4fbd4d
+16_rr_repeat_b,16_rr_repeat_b_2.png,Снимок экрана 2026-11-19 183120.png,T2: изменение MMR до 8100 и COMMIT.,8eb32831a87c7b733e633abd86e9118b973e3d7481ce6475a05f4adf3de6d3b5
+16_rr_repeat_b,16_rr_repeat_b_3.png,Снимок экрана 2026-11-19 183126.png,T1 продолжает видеть 8000.,004adbb5cb62058fdd235ef2ad6232915db1941f1176a455bcd7303c23ffa807
+16_rr_repeat_b,16_rr_repeat_b_4.png,Снимок экрана 2026-11-19 183131.png,После COMMIT T1 виден MMR 8100.,edb32a055acc9f56f79ed5cb4493c83585b3d5e667800508f8069013309082a7
+17_rr_phantom_a,17_rr_phantom_a_1.png,Снимок экрана 2026-11-19 183140.png,T1: в команде один игрок.,52e72db82bba55c3d40b19f54d894227b762f306650b0693b64cecd25e099891
+17_rr_phantom_a,17_rr_phantom_a_2.png,Снимок экрана 2026-11-19 183146.png,T2: INSERT игрока и COMMIT.,1f2428ad44ace717d8384db5d7a61f1c40024d8e6ecfc2f0002801d91d6a207c
+17_rr_phantom_a,17_rr_phantom_a_3.png,Снимок экрана 2026-11-19 183153.png,T1 по-прежнему видит одного игрока.,3a5aa735e7c9822f182f40e75f27b486217a58e086426a168652f641cf17f7a5
+17_rr_phantom_a,17_rr_phantom_a_4.png,Снимок экрана 2026-11-19 183159.png,После COMMIT T1 видит двух игроков.,140d3991ac7b235ec8ca2e07c82ad17392a21397654d5f65882449e6674b0149
+18_rr_phantom_b,18_rr_phantom_b_1.png,Снимок экрана 2026-11-19 183209.png,T1: в выборке один предмет.,2a033e440fac85c4b6e7b5c614555370207a16d32d953d4639576b429267a40e
+18_rr_phantom_b,18_rr_phantom_b_2.png,Снимок экрана 2026-11-19 183218.png,T2: INSERT предмета и COMMIT.,4a777c57014016a591f53fc6b7ebbbf0da7722dacce45dcec269b5ee1ee3c982
+18_rr_phantom_b,18_rr_phantom_b_3.png,Снимок экрана 2026-11-19 183225.png,T1 на прежнем снимке видит один предмет.,160e5f6f86e0955a254a2dded292240a315951ab8ac68b50882765433bc4681c
+18_rr_phantom_b,18_rr_phantom_b_4.png,Снимок экрана 2026-11-19 183232.png,После завершения T1 видит два предмета.,fd04407375b959cdcbc52875e58b4a660e6a0669d3c4c4e4c11425991390b094
+19_serial_insert_a,19_serial_insert_a_1.png,Снимок экрана 2026-11-19 183243.png,T1: подходящих матчей 0.,268c9899969a1f8cd60bc675cd34eda6dc99697c6dc64a131172e6c0156baef8
+19_serial_insert_a,19_serial_insert_a_2.png,Снимок экрана 2026-11-19 183255.png,T2: подходящих матчей 0.,7036ed911d2559ceab7d1f157a982027f1c0f7e3fd50ffcde5c98d1dc8fa3cf7
+19_serial_insert_a,19_serial_insert_a_3.png,Снимок экрана 2026-11-19 183304.png,T1 вставляет матч и выполняет COMMIT.,8f404bb724df80fa53a92197210544c73739e26b7a7e0f793da9bfa7b602eaa0
+19_serial_insert_a,19_serial_insert_a_4.png,Снимок экрана 2026-11-19 183313.png,T2 получает ошибку сериализации 40001 при вставке.,484e69ba5866752c9478a85bf3b0fb1b8e70489f12326a69ef19cb53f6a1f0d9
+19_serial_insert_a,19_serial_insert_a_5.png,Снимок экрана 2026-11-19 183319.png,T2 выполняет ROLLBACK.,cb7d426173816e04f8a3773cdb5d1a497a37385b8ec2db38a93bf1ed5b86fda1
+19_serial_insert_a,19_serial_insert_a_6.png,Снимок экрана 2026-11-19 183329.png,"Повтор T2: матч уже существует, количество 1.",57a4dd728286d7ab3da71e9c2fe4fae8d87b096227259d2e8460fe4747d32f9d
+19_serial_insert_a,19_serial_insert_a_7.png,Снимок экрана 2026-11-19 183401.png,Итоговая проверка: один матч.,79c0be9150b67726336b355eccb034502e559b78bdac5af7f4036b8dd80a6965
+20_serial_insert_b,20_serial_insert_b_1.png,Снимок экрана 2026-11-19 183433.png,T1: подходящих матчей 0.,384952d17e6c4d3cb94b2eb4bd14deeae0c0799f8225705dc43470435a62a1e5
+20_serial_insert_b,20_serial_insert_b_2.png,Снимок экрана 2026-11-19 183440.png,T2: подходящих матчей 0.,8590ad8a3258fc1bb860d66990aaac041c0bb1d5a2e32ceb81d37a33a86d2f56
+20_serial_insert_b,20_serial_insert_b_3.png,Снимок экрана 2026-11-19 183447.png,T1 вставляет матч и выполняет COMMIT.,61f283d68a47c9e4516839b12d6998756fa11c496008da9699fc6bb63cacb58d
+20_serial_insert_b,20_serial_insert_b_4.png,Снимок экрана 2026-11-19 183500.png,T2 получает SQLSTATE 40001.,e47ebc50d16e447d4627f80d870163ee8868698aa4001d7993f0793ed483c80f
+20_serial_insert_b,20_serial_insert_b_5.png,Снимок экрана 2026-11-19 183506.png,T2 выполняет ROLLBACK.,85ddd36568ce9b376d9b4e9605bff4ad287f075ee1525fea1fff866daebc6b0a
+20_serial_insert_b,20_serial_insert_b_6.png,Снимок экрана 2026-11-19 183514.png,Повтор T2: найден один матч.,10823d3aca8cada419a6eb7444f4f4bf8380fdaf74429a0ba919f74aefcd4f1e
+20_serial_insert_b,20_serial_insert_b_7.png,Снимок экрана 2026-11-19 183520.png,Повторный INSERT с NOT EXISTS и COMMIT.,7180509aee39308554c6e3c0cd9b10e01973c4e30499a1ff3432b4836c20e2be
+20_serial_insert_b,20_serial_insert_b_8.png,Снимок экрана 2026-11-19 183528.png,Итог: остался один матч.,b5ff5788d1da53e4f4959add94b3427b67c1f372edec95a64b8303b62a504d9e
+21_serial_update_a,21_serial_update_a_1.png,Снимок экрана 2026-11-19 183722.png,T1: первоначальная цена 100.,ca14cd50caed434b01f3e8611f4e104673d19ba75628d304d3d37eb3c23a6cb3
+21_serial_update_a,21_serial_update_a_2.png,Снимок экрана 2026-11-19 183728.png,T2: первоначальная цена 100.,65eb681ca06ddde1a856a0a5d6b192c047c14f7781506e28700f9b42c0f956c4
+21_serial_update_a,21_serial_update_a_3.png,Снимок экрана 2026-11-19 183735.png,T1 увеличивает цену на 10 и выполняет COMMIT.,6aee55c76b7beac31149fd826684b2019c4f9e9e0acd8a7ed54cd91026cec22c
+21_serial_update_a,21_serial_update_a_4.png,Снимок экрана 2026-11-19 183743.png,"T2: ошибка конкурентного UPDATE, SQLSTATE 40001.",0ee3a8ba8f75f26fa04ff3659006c9724dab7d4827fd74a3f1a5f721380cfe3e
+21_serial_update_a,21_serial_update_a_5.png,Снимок экрана 2026-11-19 183751.png,T2 выполняет ROLLBACK.,0d3a3b81a6b81e72847433027f134f726473bce019037e8552063ef63765442d
+21_serial_update_a,21_serial_update_a_6.png,Снимок экрана 2026-11-19 183800.png,Повтор T2: чтение новой цены 110.,a2211ffaa6fdf754dab29fe5365dcc5204fa0bdee1916e03ac5dac0d2624f589
+21_serial_update_a,21_serial_update_a_7.png,Снимок экрана 2026-11-19 183807.png,T2 увеличивает цену на 20 и выполняет COMMIT.,ed88fc5261de5d2f51dea99ed0f3e5854e420481058d509db87ee92f924f4550
+21_serial_update_a,21_serial_update_a_8.png,Снимок экрана 2026-11-19 183814.png,Итоговая цена 130.,2e6952e9d3fdb5af863fbcc7ede1df962e045249299aff7485cc6457b82698c9
+22_serial_update_b,22_serial_update_b_1.png,Снимок экрана 2026-11-19 183840.png,T1: первоначальный MMR 8000.,d7eb8988db22d70e4ac029d6bc7b2ccaab60c113ce8a83e0afe45f3ed87f5121
+22_serial_update_b,22_serial_update_b_2.png,Снимок экрана 2026-11-19 183848.png,T2: первоначальный MMR 8000.,52f0ac2aa7a7e4bffbab4711ebe59d1970fba13e8e670bd1be22fe232561b645
+22_serial_update_b,22_serial_update_b_3.png,Снимок экрана 2026-11-19 183854.png,T1 добавляет 100 и выполняет COMMIT.,e2d7ee1f03127f53329f13aa5b2c7647f4a1093f55a7e2f1beb7b2eb18367ded
+22_serial_update_b,22_serial_update_b_4.png,Снимок экрана 2026-11-19 183903.png,T2: SQLSTATE 40001 при конкурентном UPDATE.,878fd0ef33511c411db7092f00b8d9df2f4fe97719c6d5ab458bd42731beff29
+22_serial_update_b,22_serial_update_b_5.png,Снимок экрана 2026-11-19 183908.png,T2 выполняет ROLLBACK.,b7de0d2ffe1a3ef0d66166c2662976ca8130d75cda16f1dc6e1418cf2ed89e42
+22_serial_update_b,22_serial_update_b_6.png,Снимок экрана 2026-11-19 183916.png,Повтор T2: MMR 8100.,c66c2f86d850d72712295be2ee8043b3ba64eaa6f2936dbf110f9b2fcc2df458
+22_serial_update_b,22_serial_update_b_7.png,Снимок экрана 2026-11-19 183923.png,T2 добавляет 200 и выполняет COMMIT.,3242a9c2a80a11edd07b06d38db7e7ae275c2a5fa6f165f701b747e2196700f4
+22_serial_update_b,22_serial_update_b_8.png,Снимок экрана 2026-11-19 183930.png,Итоговый MMR 8300.,cc3f27794d34e1716788f04be6a5bbeb2906e8a81c4cdba4d1ff254bf56a8745
+23_savepoint_one,23_savepoint_one_1.png,Снимок экрана 2026-11-19 183942.png,Изменения и игрок Before созданы до SAVEPOINT.,64c9ec55b00966353ad04340516300c2e056f43057eb27dd598962dc340d09fe
+23_savepoint_one,23_savepoint_one_2.png,Снимок экрана 2026-11-19 183952.png,Игрок After и второе изменение даты созданы после SAVEPOINT.,42fb9bcca979f10c874e4e5ccfd132502366553f7852a74f083f8e7f2adcbc61
+23_savepoint_one,23_savepoint_one_3.png,Снимок экрана 2026-11-19 184000.png,Перед откатом видны Before и After.,662442a2b39dff83bad894c022947a510f1ac982e92e2381e84af22eba5c6589
+23_savepoint_one,23_savepoint_one_4.png,Снимок экрана 2026-11-19 184007.png,После ROLLBACK TO остался только Before.,10c091ae9471fad80688e58f961b723202c0763233ca56be4b76eac4e49c17e0
+23_savepoint_one,23_savepoint_one_5.png,Снимок экрана 2026-11-19 184014.png,После завершения транзакции Before сохранился.,b7b7f4b354e3163b27c8c2cc221e9609fc0a7b6742fc1c78135c6fdaaaf42e99
+24_savepoint_two,24_savepoint_two_1.png,Снимок экрана 2026-11-19 184025.png,"Созданы две точки, текущая цена 130.",2177e95f3f83a9b3fb790e99314382ab9c22fe6517431206f34ea192bacfe7ab
+24_savepoint_two,24_savepoint_two_2.png,Снимок экрана 2026-11-19 184032.png,ROLLBACK TO second_point возвращает 120.,c5689864aefe73fca6b2fde029cd8d99faee23e0a3cf08d2bc2ec8db3fc5cc85
+24_savepoint_two,24_savepoint_two_3.png,Снимок экрана 2026-11-19 184039.png,ROLLBACK TO first_point возвращает 110.,fe36445ea32ade8aaf811b66dae305b1fa4ce5c67105e9cb438f2b0739171fdc
+24_savepoint_two,24_savepoint_two_4.png,Снимок экрана 2026-11-19 184046.png,После RELEASE и COMMIT цена 110.,f1b47e6cb5339580fe82356bf21b668b6d8a3c5b42c5d59873b8c4ebdaeba4cd
