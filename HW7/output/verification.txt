@@ -5,3 +5,5 @@ Original rows of all 14 nf tables unchanged: PASS
 Cleanup restores original table data: PASS
 Cleanup repeated: PASS
 Sequences are not reset and are not included in the row comparison.
+Bootstrap on an empty database: PASS
+Repeated bootstrap on an existing schema rejected without changing rows: PASS
