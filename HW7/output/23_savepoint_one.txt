@@ -1,0 +1,43 @@
+23_savepoint_one: SAVEPOINT: сохранить изменения до точки
+Source: actual PostgreSQL execution, two independent connections when needed.
+PostgreSQL 17.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+STEP 1 [T1]
+BEGIN;
+UPDATE nf.Teams SET foundation_date = DATE '2010-01-01' WHERE name = 'HW7_TX_23_Team';
+INSERT INTO nf.Players (nickname, mmr, team_id)
+SELECT 'HW7_TX_23_Before', 8000, team_id FROM nf.Teams WHERE name = 'HW7_TX_23_Team';
+SAVEPOINT before_extra;
+{"status": "BEGIN"}
+{"status": "UPDATE 1"}
+{"status": "INSERT 0 1"}
+{"status": "SAVEPOINT"}
+
+STEP 2 [T1]
+UPDATE nf.Teams SET foundation_date = DATE '2020-01-01' WHERE name = 'HW7_TX_23_Team';
+INSERT INTO nf.Players (nickname, mmr, team_id)
+SELECT 'HW7_TX_23_After', 9000, team_id FROM nf.Teams WHERE name = 'HW7_TX_23_Team';
+{"status": "UPDATE 1"}
+{"status": "INSERT 0 1"}
+
+STEP 3 [T1]
+SELECT foundation_date FROM nf.Teams WHERE name = 'HW7_TX_23_Team';
+SELECT nickname FROM nf.Players WHERE nickname IN ('HW7_TX_23_Before', 'HW7_TX_23_After') ORDER BY nickname;
+{"columns": ["foundation_date"], "rows": [["2020-01-01"]]}
+{"columns": ["nickname"], "rows": [["HW7_TX_23_After"], ["HW7_TX_23_Before"]]}
+
+STEP 4 [T1]
+ROLLBACK TO SAVEPOINT before_extra;
+SELECT foundation_date FROM nf.Teams WHERE name = 'HW7_TX_23_Team';
+SELECT nickname FROM nf.Players WHERE nickname IN ('HW7_TX_23_Before', 'HW7_TX_23_After') ORDER BY nickname;
+{"status": "ROLLBACK"}
+{"columns": ["foundation_date"], "rows": [["2010-01-01"]]}
+{"columns": ["nickname"], "rows": [["HW7_TX_23_Before"]]}
+
+STEP 5 [T1]
+COMMIT;
+SELECT foundation_date FROM nf.Teams WHERE name = 'HW7_TX_23_Team';
+SELECT nickname FROM nf.Players WHERE nickname IN ('HW7_TX_23_Before', 'HW7_TX_23_After') ORDER BY nickname;
+{"status": "COMMIT"}
+{"columns": ["foundation_date"], "rows": [["2010-01-01"]]}
+{"columns": ["nickname"], "rows": [["HW7_TX_23_Before"]]}

@@ -1,0 +1,57 @@
+20_serial_insert_b: SERIALIZABLE: две одинаковые заявки на матч (2400 секунд)
+Source: actual PostgreSQL execution, two independent connections when needed.
+PostgreSQL 17.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+STEP 1 [T1]
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+SELECT count(*) AS matches_count FROM nf.Matches WHERE game_mode_id = (SELECT game_mode_id FROM nf.GameModes WHERE mode_name = 'HW7_TX_20_Mode')
+  AND match_date = DATE '2026-11-19' AND duration_sec = 2400;
+{"status": "BEGIN"}
+{"columns": ["matches_count"], "rows": [[0]]}
+
+STEP 2 [T2]
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+SELECT count(*) AS matches_count FROM nf.Matches WHERE game_mode_id = (SELECT game_mode_id FROM nf.GameModes WHERE mode_name = 'HW7_TX_20_Mode')
+  AND match_date = DATE '2026-11-19' AND duration_sec = 2400;
+{"status": "BEGIN"}
+{"columns": ["matches_count"], "rows": [[0]]}
+
+STEP 3 [T1]
+INSERT INTO nf.Matches (duration_sec, game_mode_id, match_date)
+SELECT 2400, game_mode_id, DATE '2026-11-19' FROM nf.GameModes WHERE mode_name = 'HW7_TX_20_Mode';
+COMMIT;
+{"status": "INSERT 0 1"}
+{"status": "COMMIT"}
+
+STEP 4 [T2]
+INSERT INTO nf.Matches (duration_sec, game_mode_id, match_date)
+SELECT 2400, game_mode_id, DATE '2026-11-19' FROM nf.GameModes WHERE mode_name = 'HW7_TX_20_Mode';
+ERROR [40001]: could not serialize access due to read/write dependencies among transactions
+DETAIL:  Reason code: Canceled on identification as a pivot, during write.
+HINT:  The transaction might succeed if retried.
+
+STEP 5 [T2]
+ROLLBACK;
+{"status": "ROLLBACK"}
+
+STEP 6 [T2]
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+SELECT count(*) AS matches_count FROM nf.Matches WHERE game_mode_id = (SELECT game_mode_id FROM nf.GameModes WHERE mode_name = 'HW7_TX_20_Mode')
+  AND match_date = DATE '2026-11-19' AND duration_sec = 2400;
+{"status": "BEGIN"}
+{"columns": ["matches_count"], "rows": [[1]]}
+
+STEP 7 [T2]
+INSERT INTO nf.Matches (duration_sec, game_mode_id, match_date)
+SELECT 2400, game_mode_id, DATE '2026-11-19' FROM nf.GameModes
+WHERE mode_name = 'HW7_TX_20_Mode'
+  AND NOT EXISTS (SELECT 1 FROM nf.Matches WHERE game_mode_id = (SELECT game_mode_id FROM nf.GameModes WHERE mode_name = 'HW7_TX_20_Mode')
+  AND match_date = DATE '2026-11-19' AND duration_sec = 2400);
+COMMIT;
+{"status": "INSERT 0 0"}
+{"status": "COMMIT"}
+
+STEP 8 [T1]
+SELECT count(*) AS matches_count FROM nf.Matches WHERE game_mode_id = (SELECT game_mode_id FROM nf.GameModes WHERE mode_name = 'HW7_TX_20_Mode')
+  AND match_date = DATE '2026-11-19' AND duration_sec = 2400;
+{"columns": ["matches_count"], "rows": [[1]]}

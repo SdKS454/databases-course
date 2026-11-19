@@ -1,0 +1,45 @@
+21_serial_update_a: SERIALIZABLE: конкурентное обновление цены
+Source: actual PostgreSQL execution, two independent connections when needed.
+PostgreSQL 17.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+STEP 1 [T1]
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+SELECT cost FROM nf.Items WHERE name = 'HW7_TX_21_Item';
+{"status": "BEGIN"}
+{"columns": ["cost"], "rows": [[100]]}
+
+STEP 2 [T2]
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+SELECT cost FROM nf.Items WHERE name = 'HW7_TX_21_Item';
+{"status": "BEGIN"}
+{"columns": ["cost"], "rows": [[100]]}
+
+STEP 3 [T1]
+UPDATE nf.Items SET cost = cost + 10 WHERE name = 'HW7_TX_21_Item';
+COMMIT;
+{"status": "UPDATE 1"}
+{"status": "COMMIT"}
+
+STEP 4 [T2]
+UPDATE nf.Items SET cost = cost + 20 WHERE name = 'HW7_TX_21_Item';
+ERROR [40001]: could not serialize access due to concurrent update
+
+STEP 5 [T2]
+ROLLBACK;
+{"status": "ROLLBACK"}
+
+STEP 6 [T2]
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+SELECT cost FROM nf.Items WHERE name = 'HW7_TX_21_Item';
+{"status": "BEGIN"}
+{"columns": ["cost"], "rows": [[110]]}
+
+STEP 7 [T2]
+UPDATE nf.Items SET cost = cost + 20 WHERE name = 'HW7_TX_21_Item';
+COMMIT;
+{"status": "UPDATE 1"}
+{"status": "COMMIT"}
+
+STEP 8 [T1]
+SELECT cost FROM nf.Items WHERE name = 'HW7_TX_21_Item';
+{"columns": ["cost"], "rows": [[130]]}

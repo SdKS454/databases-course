@@ -1,0 +1,28 @@
+14_rc_phantom_b: READ COMMITTED: новый предмет в выборке
+Source: actual PostgreSQL execution, two independent connections when needed.
+PostgreSQL 17.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+STEP 1 [T1]
+BEGIN ISOLATION LEVEL READ COMMITTED;
+SELECT count(*) AS items_count FROM nf.Items WHERE description = 'HW7_TX_14_Group' AND cost >= 100;
+{"status": "BEGIN"}
+{"columns": ["items_count"], "rows": [[1]]}
+
+STEP 2 [T2]
+BEGIN;
+INSERT INTO nf.Items (name, cost, description)
+VALUES ('HW7_TX_14_New', 200, 'HW7_TX_14_Group');
+COMMIT;
+{"status": "BEGIN"}
+{"status": "INSERT 0 1"}
+{"status": "COMMIT"}
+
+STEP 3 [T1]
+SELECT count(*) AS items_count FROM nf.Items WHERE description = 'HW7_TX_14_Group' AND cost >= 100;
+{"columns": ["items_count"], "rows": [[2]]}
+
+STEP 4 [T1]
+COMMIT;
+SELECT count(*) AS items_count FROM nf.Items WHERE description = 'HW7_TX_14_Group' AND cost >= 100;
+{"status": "COMMIT"}
+{"columns": ["items_count"], "rows": [[2]]}

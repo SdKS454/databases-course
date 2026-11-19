@@ -1,0 +1,31 @@
+17_rr_phantom_a: REPEATABLE READ: новый игрок команды
+Source: actual PostgreSQL execution, two independent connections when needed.
+PostgreSQL 17.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+STEP 1 [T1]
+BEGIN ISOLATION LEVEL REPEATABLE READ;
+SELECT count(*) AS players_count FROM nf.Players
+WHERE team_id = (SELECT team_id FROM nf.Teams WHERE name = 'HW7_TX_17_Team');
+{"status": "BEGIN"}
+{"columns": ["players_count"], "rows": [[1]]}
+
+STEP 2 [T2]
+BEGIN;
+INSERT INTO nf.Players (nickname, mmr, team_id)
+SELECT 'HW7_TX_17_New', 8500, team_id FROM nf.Teams WHERE name = 'HW7_TX_17_Team';
+COMMIT;
+{"status": "BEGIN"}
+{"status": "INSERT 0 1"}
+{"status": "COMMIT"}
+
+STEP 3 [T1]
+SELECT count(*) AS players_count FROM nf.Players
+WHERE team_id = (SELECT team_id FROM nf.Teams WHERE name = 'HW7_TX_17_Team');
+{"columns": ["players_count"], "rows": [[1]]}
+
+STEP 4 [T1]
+COMMIT;
+SELECT count(*) AS players_count FROM nf.Players
+WHERE team_id = (SELECT team_id FROM nf.Teams WHERE name = 'HW7_TX_17_Team');
+{"status": "COMMIT"}
+{"columns": ["players_count"], "rows": [[2]]}

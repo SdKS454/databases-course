@@ -1,0 +1,45 @@
+22_serial_update_b: SERIALIZABLE: конкурентное обновление MMR
+Source: actual PostgreSQL execution, two independent connections when needed.
+PostgreSQL 17.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+STEP 1 [T1]
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_22_Player';
+{"status": "BEGIN"}
+{"columns": ["mmr"], "rows": [[8000]]}
+
+STEP 2 [T2]
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_22_Player';
+{"status": "BEGIN"}
+{"columns": ["mmr"], "rows": [[8000]]}
+
+STEP 3 [T1]
+UPDATE nf.Players SET mmr = mmr + 100 WHERE nickname = 'HW7_TX_22_Player';
+COMMIT;
+{"status": "UPDATE 1"}
+{"status": "COMMIT"}
+
+STEP 4 [T2]
+UPDATE nf.Players SET mmr = mmr + 200 WHERE nickname = 'HW7_TX_22_Player';
+ERROR [40001]: could not serialize access due to concurrent update
+
+STEP 5 [T2]
+ROLLBACK;
+{"status": "ROLLBACK"}
+
+STEP 6 [T2]
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_22_Player';
+{"status": "BEGIN"}
+{"columns": ["mmr"], "rows": [[8100]]}
+
+STEP 7 [T2]
+UPDATE nf.Players SET mmr = mmr + 200 WHERE nickname = 'HW7_TX_22_Player';
+COMMIT;
+{"status": "UPDATE 1"}
+{"status": "COMMIT"}
+
+STEP 8 [T1]
+SELECT mmr FROM nf.Players WHERE nickname = 'HW7_TX_22_Player';
+{"columns": ["mmr"], "rows": [[8300]]}

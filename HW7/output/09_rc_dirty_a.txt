@@ -1,0 +1,31 @@
+09_rc_dirty_a: READ COMMITTED: грязное чтение, цена предмета
+Source: actual PostgreSQL execution, two independent connections when needed.
+PostgreSQL 17.10 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+STEP 1 [T1]
+BEGIN;
+UPDATE nf.Items SET cost = 900 WHERE name = 'HW7_TX_09_Item';
+{"status": "BEGIN"}
+{"status": "UPDATE 1"}
+
+STEP 2 [T2]
+BEGIN ISOLATION LEVEL READ COMMITTED;
+SHOW transaction_isolation;
+{"status": "BEGIN"}
+{"columns": ["transaction_isolation"], "rows": [["read committed"]]}
+
+STEP 3 [T2]
+SELECT cost FROM nf.Items WHERE name = 'HW7_TX_09_Item';
+{"columns": ["cost"], "rows": [[100]]}
+
+STEP 4 [T1]
+ROLLBACK;
+{"status": "ROLLBACK"}
+
+STEP 5 [T2]
+SELECT cost FROM nf.Items WHERE name = 'HW7_TX_09_Item';
+{"columns": ["cost"], "rows": [[100]]}
+
+STEP 6 [T2]
+COMMIT;
+{"status": "COMMIT"}
